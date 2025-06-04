@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react';
-import { Globe, Server, Bell, Home, X } from 'lucide-react';
+import { Globe, Server, Bell, Home, X, LogOut } from 'lucide-react';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -32,22 +32,14 @@ interface SidebarProps {
   onNavigate: (page: 'dashboard' | 'domains' | 'hosting' | 'notifications') => void;
   currentPage: 'dashboard' | 'domains' | 'hosting' | 'notifications';
   onClose?: () => void;
+  onSignOut?: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose, onSignOut }) => {
   return (
     <aside className="w-full h-full bg-card border-r border-border flex flex-col shadow-sm">
-      <div className="p-6">
+      <div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-              <img src="/favicon.png" alt="Logo" className="w-full h-full object-cover" />
-            </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">TrackingDude</h1>
-              <p className="text-xs text-muted-foreground">Gestión de Dominios</p>
-            </div>
-          </div>
           
           {/* Botón cerrar en móvil */}
           {onClose && (
@@ -63,8 +55,19 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose }) =
 
       <div className="flex-1 px-3 py-2">
         <nav>
+        <div className="bg-card border-b border-border flex items-center justify-between px-6 py-3">
+       <div className="flex items-center gap-2">
+         <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+           <img src="/favicon.png" alt="Logo" className="w-5 h-5" />
+         </div>
+         <div>
+           <h1 className="text-sm font-semibold text-foreground">TrackingDude</h1>
+           <p className="text-xs text-muted-foreground">Gestión de Dominios</p>
+         </div>
+       </div>
+     </div>
           <div className="mb-4 px-3">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-9">
               Menú Principal
             </p>
           </div>
@@ -98,8 +101,17 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose }) =
       </div>
 
       <div className="p-4 border-t border-border">
-        <div className="text-xs text-muted-foreground text-center">
-          © 2024 TrackingDude
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            className="w-full flex items-center justify-center gap-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-900/40 transition-colors"
+          >
+            <LogOut size={18} />
+            <span>Cerrar Sesión</span>
+          </button>
+        )}
+        <div className="text-xs text-muted-foreground text-center mt-4">
+          © 2025 TrackingDude
         </div>
       </div>
     </aside>

@@ -14,7 +14,7 @@ async function main() {
       email: 'admin@trackingdude.com',
       name: 'Administrador',
       password: hashedPassword,
-      phone: '+34123456789',
+      phone: '+59899999999',
     },
   })
 

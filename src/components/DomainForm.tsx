@@ -115,7 +115,7 @@ const DomainForm: React.FC = () => {
         </div>
 
         {/* Checkbox para verificación */}
-        <div className="flex items-start space-x-3">
+        {/* <div className="flex items-start space-x-3">
           <input
             type="checkbox"
             id="check-availability"
@@ -126,7 +126,7 @@ const DomainForm: React.FC = () => {
           <label htmlFor="check-availability" className="text-sm text-muted-foreground leading-relaxed">
             Verificar disponibilidad del dominio usando la API de Hostinger
           </label>
-        </div>
+        </div> */}
         
         {/* Grid responsive de campos del formulario */}
         <div className="form-grid">

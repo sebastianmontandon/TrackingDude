@@ -71,24 +71,32 @@ const AppContent: React.FC = () => {
             onNavigate={handleNavigate} 
             currentPage={currentPage}
             onClose={() => setSidebarOpen(false)}
+            onSignOut={() => signOut()}
           />
         </div>
         
         {/* Main content */}
         <div className="flex-1 flex flex-col min-h-0">
           {/* Header móvil */}
-          <div className="lg:hidden bg-card border-b border-border p-4 flex items-center justify-between flex-shrink-0">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-lg font-semibold text-foreground">TrackingDude</h1>
-            <div className="w-10" /> {/* Spacer */}
+          <div className="lg:hidden bg-card border-b border-border p-3 flex items-center justify-between flex-shrink-0">
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+            <img src="/favicon.png" alt="Logo" className="w-5 h-5" />
           </div>
+          <div>
+            <h1 className="text-sm font-semibold text-foreground">TrackingDude</h1>
+          </div>
+        </div>
+        <div className="w-10" /> {/* Spacer */}
+      </div>
           
           {/* Content */}
           <main className="flex-1 overflow-y-auto bg-background">
@@ -101,19 +109,21 @@ const AppContent: React.FC = () => {
 };
 
 // Header component with user info
-const UserHeader: React.FC<{ user: any }> = ({ user }) => {
-  return (
-    <div className="bg-card border-b border-border p-4 flex items-center justify-between">
-      <button
-        onClick={() => signOut()}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-      >
-        <LogOut className="h-4 w-4" />
-        Cerrar Sesión
-      </button>
-    </div>
-  );
-};
+// const UserHeader: React.FC = () => {
+//   return (
+//     <div className="bg-card border-b border-border flex items-center justify-between px-6 py-3">
+//       <div className="flex items-center gap-2">
+//         <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
+//           <img src="/favicon.png" alt="Logo" className="w-5 h-5" />
+//         </div>
+//         <div>
+//           <h1 className="text-sm font-semibold text-foreground">TrackingDude</h1>
+//           <p className="text-xs text-muted-foreground">Gestión de Dominios</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -148,7 +158,7 @@ export default function Home() {
 
   return (
     <div className="h-full">
-      <UserHeader user={session?.user} />
+      {/* <UserHeader/> */}
       <DomainProvider>
         <HostingProvider>
           <NotificationProvider>

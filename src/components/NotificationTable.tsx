@@ -10,7 +10,7 @@ interface NotificationTableProps {
 }
 
 const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
-  const { notifications, removeNotification } = useNotificationContext();
+  const { notifications, removeNotification, loading, error } = useNotificationContext();
   const [sortField, setSortField] = useState<keyof Notification>('domain');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -29,6 +29,34 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
   const filteredNotifications = notifications.filter(
     notification => notification.type === apiType
   );
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="form-section notification-table">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Cargando notificaciones...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="form-section notification-table">
+        <div className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <div className="text-red-500 mb-2">⚠️</div>
+            <p className="text-red-500">Error: {error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSort = (field: keyof Notification) => {
     if (sortField === field) {

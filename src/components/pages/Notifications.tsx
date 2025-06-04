@@ -226,6 +226,30 @@ const NotificationConfigForm: React.FC = () => {
   )
 }
 
+// Debug component to show notification context state
+const NotificationDebug: React.FC = () => {
+  const { notifications, loading, error } = useNotificationContext();
+  
+  return (
+    <div className="bg-yellow-900 p-4 rounded-lg mb-4">
+      <h3 className="font-bold text-yellow-200">Debug Info:</h3>
+      <p>Loading: {loading ? 'true' : 'false'}</p>
+      <p>Error: {error || 'none'}</p>
+      <p>Total notifications: {notifications.length}</p>
+      <p>Domain notifications: {notifications.filter(n => n.type === 'DOMAIN').length}</p>
+      <p>Hosting notifications: {notifications.filter(n => n.type === 'HOSTING').length}</p>
+      {notifications.length > 0 && (
+        <details className="mt-2">
+          <summary className="cursor-pointer">Ver datos completos</summary>
+          <pre className="text-xs mt-2 overflow-auto max-h-40">
+            {JSON.stringify(notifications, null, 2)}
+          </pre>
+        </details>
+      )}
+    </div>
+  );
+};
+
 export default function Notifications() {
   return (
     <div className="page-container">
@@ -270,6 +294,18 @@ export default function Notifications() {
         </div>
         <NotificationTable type="hosting" />
       </div>
+      
+      {/* Notification Debug Section */}
+      {/* <div className="content-section">
+        <div className="section-header">
+          <h2 className="section-title">Información de Depuración</h2>
+          <p className="section-description">
+            Información sobre el estado del contexto de notificaciones
+          </p>
+        </div>
+        <NotificationDebug />
+      </div>
+      */}
     </div>
   )
 } 

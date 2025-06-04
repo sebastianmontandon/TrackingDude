@@ -25,19 +25,17 @@ export default function SignIn() {
         email: formData.email,
         password: formData.password,
         redirect: false,
+        callbackUrl: '/' // Redirigir a la página principal después del login
       })
 
       if (result?.error) {
         setError('Credenciales inválidas')
       } else {
-        // Get session to check if login was successful
-        const session = await getSession()
-        if (session) {
-          router.push('/')
-          router.refresh()
-        }
+        // Redirigir a la página principal
+        window.location.href = result?.url || '/'; // Usar window.location para forzar una recarga completa
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError('Error al iniciar sesión')
     } finally {
       setIsLoading(false)

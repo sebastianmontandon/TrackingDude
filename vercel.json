@@ -1,14 +1,22 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
   "framework": "nextjs",
+  "buildCommand": "npx prisma generate && npm run build",
   "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    },
     "src/app/api/**/*.ts": {
-      "maxDuration": 10
+      "maxDuration": 30  
     }
   },
   "env": {
-    "NEXT_TELEMETRY_DISABLED": "1"
-  }
+    "NEXT_TELEMETRY_DISABLED": "1",
+    "SKIP_ENV_VALIDATION": "true"
+  },
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    }
+  ]
 } 

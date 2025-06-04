@@ -1,124 +1,240 @@
 'use client'
 
-import React from 'react';
-import { Bell, Calendar, Globe, Server } from 'lucide-react';
+import React, { useState } from 'react';
+import { Bell, Calendar, Globe, Server, Trash2, ArrowUpDown } from 'lucide-react';
 import { useNotificationContext, Notification } from '../contexts/NotificationContext';
+import ConfirmDialog from './ConfirmDialog';
 
 interface NotificationTableProps {
   type: 'domain' | 'hosting';
 }
 
 const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
-  const { notifications } = useNotificationContext();
+  const { notifications, removeNotification } = useNotificationContext();
+  const [sortField, setSortField] = useState<keyof Notification>('domain');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    notificationId: string;
+    notificationDomain: string;
+  }>({
+    isOpen: false,
+    notificationId: '',
+    notificationDomain: ''
+  });
   
   const filteredNotifications = notifications.filter(
     notification => notification.type === type
   );
 
-  const getNotificationMethodBadge = (method: string) => {
-    switch (method.toLowerCase()) {
-      case 'email':
-        return { color: 'bg-blue-500', icon: '✉️', label: 'Email' };
-      case 'sms':
-        return { color: 'bg-green-500', icon: '📱', label: 'SMS' };
-      case 'push':
-        return { color: 'bg-purple-500', icon: '🔔', label: 'Push' };
-      case 'whatsapp':
-        return { color: 'bg-green-600', icon: '📞', label: 'WhatsApp' };
-      default:
-        return { color: 'bg-gray-500', icon: '📢', label: method };
+  const handleSort = (field: keyof Notification) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
     }
   };
 
+  const getSortedNotifications = () => {
+    return [...filteredNotifications].sort((a, b) => {
+      let comparison = 0;
+      const aValue = a[sortField];
+      const bValue = b[sortField];
+      
+      if (aValue < bValue) {
+        comparison = -1;
+      } else if (aValue > bValue) {
+        comparison = 1;
+      }
+      
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  };
+
+  const getNotificationMethodBadge = (method: string) => {
+    switch (method.toLowerCase()) {
+      case 'email':
+        return { color: 'bg-blue-500', label: 'Email' };
+      case 'whatsapp':
+        return { color: 'bg-green-600', label: 'WhatsApp' };
+      default:
+        return { color: 'bg-gray-500', label: method };
+    }
+  };
+
+  const handleDeleteClick = (notificationId: string, notificationDomain: string) => {
+    setDeleteDialog({
+      isOpen: true,
+      notificationId,
+      notificationDomain
+    });
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await removeNotification(deleteDialog.notificationId);
+    } catch (error) {
+      console.error('Error eliminando notificación:', error);
+    }
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteDialog({
+      isOpen: false,
+      notificationId: '',
+      notificationDomain: ''
+    });
+  };
+
+  const sortedNotifications = getSortedNotifications();
+
   return (
-    <div className="form-section notification-table">
-      <div className="table-container">
-        <table className="table-responsive">
-          <thead className="table-header">
-            <tr>
-              <th scope="col" className="table-header-cell">
-                <div className="flex items-center gap-1">
-                  {type === 'domain' ? (
-                    <Globe size={14} className="text-muted-foreground" />
-                  ) : (
-                    <Server size={14} className="text-muted-foreground" />
-                  )}
-                  <span className="hidden sm:inline">
-                    {type === 'domain' ? 'Dominio' : 'Servicio'}
-                  </span>
-                  <span className="sm:hidden">
-                    {type === 'domain' ? 'Dom.' : 'Serv.'}
-                  </span>
-                </div>
-              </th>
-              <th scope="col" className="table-header-cell hidden md:table-cell">
-                <span>Proveedor</span>
-              </th>
-              <th scope="col" className="table-header-cell hidden lg:table-cell">
-                <div className="flex items-center gap-1">
-                  <Calendar size={14} className="text-muted-foreground" />
-                  <span>Fecha</span>
-                </div>
-              </th>
-              <th scope="col" className="table-header-cell">
-                <div className="flex items-center gap-1">
-                  <Bell size={14} className="text-muted-foreground" />
-                  <span className="hidden sm:inline">Método</span>
-                  <span className="sm:hidden">Mét.</span>
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody className="table-body">
-            {filteredNotifications.map((notification) => {
-              const methodInfo = getNotificationMethodBadge(notification.notificationMethod);
-              
-              return (
-                <tr key={notification.id} className="table-row">
-                  <td className="table-cell">
-                    <div className="min-w-0">
-                      <div className="table-cell-text-primary truncate">{notification.domain}</div>
-                      <div className="md:hidden table-cell-text-secondary text-xs mt-1 space-y-1">
-                        <div className="truncate">{notification.provider}</div>
-                        <div className="lg:hidden text-xs text-muted-foreground">
-                          {notification.notificationDate}
+    <>
+      <div className="form-section notification-table">
+        <div className="table-container">
+          <table className="table-responsive">
+            <thead className="table-header">
+              <tr>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-domain"
+                  onClick={() => handleSort('domain')}
+                >
+                  <div className="flex items-center gap-1">
+                    {type === 'domain' ? (
+                      <Globe size={14} className="text-muted-foreground" />
+                    ) : (
+                      <Server size={14} className="text-muted-foreground" />
+                    )}
+                    <span className="hidden sm:inline">
+                      {type === 'domain' ? 'Dominio' : 'Servicio'}
+                    </span>
+                    <span className="sm:hidden">
+                      {type === 'domain' ? 'Dom.' : 'Serv.'}
+                    </span>
+                    <ArrowUpDown size={12} />
+                  </div>
+                </th>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-provider hidden md:table-cell"
+                  onClick={() => handleSort('provider')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Proveedor</span>
+                    <ArrowUpDown size={12} />
+                  </div>
+                </th>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-date hidden lg:table-cell"
+                  onClick={() => handleSort('notificationDate')}
+                >
+                  <div className="flex items-center gap-1">
+                    <Calendar size={14} className="text-muted-foreground" />
+                    <span>Fecha</span>
+                    <ArrowUpDown size={12} />
+                  </div>
+                </th>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-method"
+                  onClick={() => handleSort('notificationMethod')}
+                >
+                  <div className="flex items-center gap-1">
+                    <Bell size={14} className="text-muted-foreground" />
+                    <span className="hidden sm:inline">Método</span>
+                    <span className="sm:hidden">Mét.</span>
+                    <ArrowUpDown size={12} />
+                  </div>
+                </th>
+                <th scope="col" className="table-header-cell col-actions">
+                  <span className="sr-only">Acciones</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="table-body">
+              {sortedNotifications.map((notification) => {
+                const methodInfo = getNotificationMethodBadge(notification.notificationMethod);
+                
+                return (
+                  <tr key={notification.id} className="table-row">
+                    <td className="table-cell col-domain">
+                      <div className="min-w-0">
+                        <div className="table-cell-text-primary truncate">{notification.domain}</div>
+                        <div className="md:hidden table-cell-text-secondary text-xs mt-1 space-y-1">
+                          <div className="truncate">{notification.provider}</div>
+                          <div className="lg:hidden text-xs text-muted-foreground flex items-center gap-1">
+                            <Calendar size={12} />
+                            <span className="truncate">{notification.notificationDate}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="table-cell hidden md:table-cell">
-                    <div className="table-cell-text-secondary truncate">{notification.provider}</div>
-                  </td>
-                  <td className="table-cell hidden lg:table-cell">
-                    <div className="table-cell-text-secondary text-xs">{notification.notificationDate}</div>
-                  </td>
-                  <td className="table-cell">
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white ${methodInfo.color}`}>
-                        <span className="mr-1">{methodInfo.icon}</span>
-                        <span className="hidden sm:inline">{methodInfo.label}</span>
-                        <span className="sm:hidden">{methodInfo.label.substring(0, 3)}</span>
-                      </span>
+                    </td>
+                    <td className="table-cell col-provider hidden md:table-cell">
+                      <div className="table-cell-text-secondary truncate">{notification.provider}</div>
+                    </td>
+                    <td className="table-cell col-date hidden lg:table-cell">
+                      <div className="table-cell-text-secondary text-xs flex items-center gap-1">
+                        <Calendar size={12} className="flex-shrink-0" />
+                        <span className="truncate">{notification.notificationDate}</span>
+                      </div>
+                    </td>
+                    <td className="table-cell col-method">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium text-white ${methodInfo.color}`}>
+                            <span className="hidden sm:inline">{methodInfo.label}</span>
+                            <span className="sm:hidden">{methodInfo.label.substring(0, 3)}</span>
+                          </span>
+                        </div>
+                        <div className="md:hidden text-xs text-muted-foreground mt-1">
+                          <span className="truncate">
+                            {type === 'domain' ? 'Notif. de dominio' : 'Notif. de hosting'}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="table-cell col-actions text-right">
+                      <button
+                        onClick={() => handleDeleteClick(notification.id, notification.domain)}
+                        className="text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-md hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        title="Eliminar notificación"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredNotifications.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="table-cell text-center text-muted-foreground py-8">
+                    <div className="flex flex-col items-center space-y-2">
+                      <Bell className="w-8 h-8 text-muted-foreground/50" />
+                      <span>No hay notificaciones para {type === 'domain' ? 'dominios' : 'servicios de hosting'}</span>
+                      <span className="text-xs">Las notificaciones aparecerán aquí automáticamente</span>
                     </div>
                   </td>
                 </tr>
-              );
-            })}
-            {filteredNotifications.length === 0 && (
-              <tr>
-                <td colSpan={4} className="table-cell text-center text-muted-foreground py-8">
-                  <div className="flex flex-col items-center space-y-2">
-                    <Bell className="w-8 h-8 text-muted-foreground/50" />
-                    <span>No hay notificaciones para {type === 'domain' ? 'dominios' : 'servicios de hosting'}</span>
-                    <span className="text-xs">Las notificaciones aparecerán aquí automáticamente</span>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Confirmar eliminación"
+        message={`¿Estás seguro de que quieres eliminar la notificación para "${deleteDialog.notificationDomain}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        type="danger"
+      />
+    </>
   );
 };
 

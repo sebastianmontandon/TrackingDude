@@ -3,17 +3,21 @@
 import React, { useState } from 'react';
 import { Check, X, Loader2, Plus } from 'lucide-react';
 import { useDomainContext } from '../contexts/DomainContext';
+import { getTodayDateString } from '../lib/utils';
 
 const DomainForm: React.FC = () => {
   const { addDomain, checkDomainAvailability } = useDomainContext();
   const [name, setName] = useState('');
-  const [creationDate, setCreationDate] = useState(new Date().toISOString().split('T')[0]);
+  const [creationDate, setCreationDate] = useState(getTodayDateString());
   const [website, setWebsite] = useState('');
   const [paymentPeriod, setPaymentPeriod] = useState('1 year');
-  const [checkAvailability, setCheckAvailability] = useState(true);
+  const [checkAvailability, setCheckAvailability] = useState(false);
   
   const [isChecking, setIsChecking] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
+  
+  // Obtener la fecha actual en formato YYYY-MM-DD para restricción
+  const today = getTodayDateString();
   
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value);
@@ -29,26 +33,30 @@ const DomainForm: React.FC = () => {
     setIsChecking(false);
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !creationDate || !website || !paymentPeriod) {
       return;
     }
     
-    addDomain({
-      name,
-      creationDate,
-      website,
-      paymentPeriod,
-    });
-    
-    // Reset form
-    setName('');
-    setCreationDate(new Date().toISOString().split('T')[0]);
-    setWebsite('');
-    setPaymentPeriod('1 year');
-    setIsAvailable(null);
+    try {
+      await addDomain({
+        name,
+        creationDate,
+        website,
+        paymentPeriod,
+      });
+      
+      // Reset form
+      setName('');
+      setCreationDate(getTodayDateString());
+      setWebsite('');
+      setPaymentPeriod('1 year');
+      setIsAvailable(null);
+    } catch (error) {
+      console.error('Error al agregar dominio:', error);
+    }
   };
   
   return (
@@ -122,9 +130,13 @@ const DomainForm: React.FC = () => {
               type="date"
               value={creationDate}
               onChange={(e) => setCreationDate(e.target.value)}
+              max={today}
               className="form-input"
               required
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              Solo se permiten fechas hasta el día de hoy
+            </p>
           </div>
           
           <div className="form-group">

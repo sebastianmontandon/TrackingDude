@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { addDays, format } from 'date-fns';
 
 export interface Domain {
@@ -14,86 +14,90 @@ export interface Domain {
 
 interface DomainContextType {
   domains: Domain[];
-  addDomain: (domain: Omit<Domain, 'id' | 'expirationDate'>) => void;
-  removeDomain: (id: string) => void;
+  addDomain: (domain: Omit<Domain, 'id' | 'expirationDate'>) => Promise<void>;
+  removeDomain: (id: string) => Promise<void>;
   checkDomainAvailability: (name: string) => Promise<boolean>;
+  loading: boolean;
+  error: string | null;
 }
 
 const DomainContext = createContext<DomainContextType | undefined>(undefined);
 
-const initialDomains: Domain[] = [
-  {
-    id: '1',
-    name: 'example.com',
-    creationDate: '2023-01-15',
-    website: 'https://example.com',
-    paymentPeriod: '1 year',
-    expirationDate: '2024-01-15',
-  },
-  {
-    id: '2',
-    name: 'mydomain.net',
-    creationDate: '2022-11-20',
-    website: 'https://mydomain.net',
-    paymentPeriod: '2 years',
-    expirationDate: '2024-11-20',
-  },
-  {
-    id: '3',
-    name: 'webproject.org',
-    creationDate: '2023-03-05',
-    website: 'https://webproject.org',
-    paymentPeriod: '1 year',
-    expirationDate: '2024-03-05',
-  },
-  {
-    id: '4',
-    name: 'designstudio.co',
-    creationDate: '2023-05-12',
-    website: 'https://designstudio.co',
-    paymentPeriod: '3 years',
-    expirationDate: '2026-05-12',
-  },
-  {
-    id: '5',
-    name: 'techblog.io',
-    creationDate: '2022-08-30',
-    website: 'https://techblog.io',
-    paymentPeriod: '1 year',
-    expirationDate: '2023-08-30',
-  }
-];
-
 export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [domains, setDomains] = useState<Domain[]>(initialDomains);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const addDomain = (domainData: Omit<Domain, 'id' | 'expirationDate'>) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    
-    // Calculate expiration date based on payment period
-    let daysToAdd = 365; // Default to 1 year
-    if (domainData.paymentPeriod.includes('2')) {
-      daysToAdd = 730; // 2 years
-    } else if (domainData.paymentPeriod.includes('3')) {
-      daysToAdd = 1095; // 3 years
+  // Cargar dominios al inicializar
+  useEffect(() => {
+    fetchDomains();
+  }, []);
+
+  const fetchDomains = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/domains');
+      if (!response.ok) {
+        throw new Error('Error al cargar dominios');
+      }
+      const data = await response.json();
+      setDomains(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error fetching domains:', err);
+    } finally {
+      setLoading(false);
     }
-    
-    const expirationDate = format(
-      addDays(new Date(domainData.creationDate), daysToAdd),
-      'yyyy-MM-dd'
-    );
-    
-    const newDomain: Domain = {
-      ...domainData,
-      id,
-      expirationDate,
-    };
-    
-    setDomains(prevDomains => [...prevDomains, newDomain]);
   };
 
-  const removeDomain = (id: string) => {
-    setDomains(prevDomains => prevDomains.filter(domain => domain.id !== id));
+  const addDomain = async (domainData: Omit<Domain, 'id' | 'expirationDate'>) => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/domains', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(domainData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear dominio');
+      }
+
+      const newDomain = await response.json();
+      setDomains(prevDomains => [...prevDomains, newDomain]);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error adding domain:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeDomain = async (id: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/domains/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar dominio');
+      }
+
+      setDomains(prevDomains => prevDomains.filter(domain => domain.id !== id));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error removing domain:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Mock function to simulate API check for domain availability
@@ -113,7 +117,14 @@ export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   };
 
   return (
-    <DomainContext.Provider value={{ domains, addDomain, removeDomain, checkDomainAvailability }}>
+    <DomainContext.Provider value={{ 
+      domains, 
+      addDomain, 
+      removeDomain, 
+      checkDomainAvailability,
+      loading,
+      error
+    }}>
       {children}
     </DomainContext.Provider>
   );

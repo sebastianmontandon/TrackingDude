@@ -5,14 +5,14 @@
 @layer base {
   :root {
     /* Colores fijos para modo oscuro */
-    --background: 222.2 84% 4.9%;
+    --background: 222.2 84% 10%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --card: 222.2 84% 10%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 222.2 84% 10%;
     --popover-foreground: 210 40% 98%;
     --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
+    --primary-foreground: 222.2 84% 10%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -21,7 +21,7 @@
     --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
+    --border: 217.2 32.6% 20%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
     --radius: 0.75rem;
@@ -265,29 +265,69 @@
     min-width: 60px;
   }
 
+  /* Ancho específico para columnas de dominios */
+  .domains-table .table-responsive {
+    width: 100%;
+  }
+
+  .domains-table .col-name {
+    width: 25%;
+    min-width: 150px;
+  }
+
+  .domains-table .col-creation {
+    width: 15%;
+    min-width: 110px;
+  }
+
+  .domains-table .col-website {
+    width: 25%;
+    min-width: 180px;
+  }
+
+  .domains-table .col-period {
+    width: 12%;
+    min-width: 90px;
+  }
+
+  .domains-table .col-expiration {
+    width: 18%;
+    min-width: 130px;
+  }
+
+  .domains-table .col-actions {
+    width: 5%;
+    min-width: 60px;
+  }
+
   /* Ancho específico para columnas de notificaciones */
   .notification-table .table-responsive {
     width: 100%;
   }
 
-  .notification-table .table-header-cell:nth-child(1) {
-    width: 35%;
-    min-width: 180px;
+  .notification-table .col-domain {
+    width: 30%;
+    min-width: 150px;
   }
 
-  .notification-table .table-header-cell:nth-child(2) {
+  .notification-table .col-provider {
     width: 25%;
     min-width: 120px;
   }
 
-  .notification-table .table-header-cell:nth-child(3) {
+  .notification-table .col-date {
     width: 20%;
     min-width: 100px;
   }
 
-  .notification-table .table-header-cell:nth-child(4) {
+  .notification-table .col-method {
     width: 20%;
     min-width: 100px;
+  }
+
+  .notification-table .col-actions {
+    width: 5%;
+    min-width: 60px;
   }
 
   /* Mobile optimizations */

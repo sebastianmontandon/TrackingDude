@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 export interface Hosting {
   id: string;
@@ -16,66 +16,99 @@ export interface Hosting {
 
 interface HostingContextType {
   hostings: Hosting[];
-  addHosting: (hosting: Omit<Hosting, 'id' | 'maintenanceFee' | 'totalCost'>) => void;
-  removeHosting: (id: string) => void;
+  addHosting: (hosting: Omit<Hosting, 'id' | 'maintenanceFee' | 'totalCost'>) => Promise<void>;
+  removeHosting: (id: string) => Promise<void>;
+  loading: boolean;
+  error: string | null;
 }
 
 const HostingContext = createContext<HostingContextType | undefined>(undefined);
 
-const initialHostings: Hosting[] = [
-  {
-    id: '1',
-    domain: 'example.com',
-    provider: 'HostGator',
-    paymentType: 'Annual',
-    includesHosting: true,
-    registrationDate: '2023-01-15',
-    baseCost: 120,
-    maintenanceFee: 24,
-    totalCost: 144,
-  },
-  {
-    id: '2',
-    domain: 'mydomain.net',
-    provider: 'Bluehost',
-    paymentType: 'Monthly',
-    includesHosting: true,
-    registrationDate: '2023-06-20',
-    baseCost: 15,
-    maintenanceFee: 3,
-    totalCost: 18,
-  },
-];
-
 export const HostingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [hostings, setHostings] = useState<Hosting[]>(initialHostings);
+  const [hostings, setHostings] = useState<Hosting[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const calculateFees = (baseCost: number) => {
-    const maintenanceFee = baseCost * 0.2;
-    const totalCost = baseCost + maintenanceFee;
-    return { maintenanceFee, totalCost };
+  // Cargar hostings al inicializar
+  useEffect(() => {
+    fetchHostings();
+  }, []);
+
+  const fetchHostings = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/hostings');
+      if (!response.ok) {
+        throw new Error('Error al cargar hostings');
+      }
+      const data = await response.json();
+      setHostings(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error fetching hostings:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const addHosting = (hostingData: Omit<Hosting, 'id' | 'maintenanceFee' | 'totalCost'>) => {
-    const id = Math.random().toString(36).substring(2, 9);
-    const { maintenanceFee, totalCost } = calculateFees(hostingData.baseCost);
-    
-    const newHosting: Hosting = {
-      ...hostingData,
-      id,
-      maintenanceFee,
-      totalCost,
-    };
-    
-    setHostings(prevHostings => [...prevHostings, newHosting]);
+  const addHosting = async (hostingData: Omit<Hosting, 'id' | 'maintenanceFee' | 'totalCost'>) => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/hostings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(hostingData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al crear hosting');
+      }
+
+      const newHosting = await response.json();
+      setHostings(prevHostings => [...prevHostings, newHosting]);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error adding hosting:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const removeHosting = (id: string) => {
-    setHostings(prevHostings => prevHostings.filter(hosting => hosting.id !== id));
+  const removeHosting = async (id: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/hostings/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al eliminar hosting');
+      }
+
+      setHostings(prevHostings => prevHostings.filter(hosting => hosting.id !== id));
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error desconocido');
+      console.error('Error removing hosting:', err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <HostingContext.Provider value={{ hostings, addHosting, removeHosting }}>
+    <HostingContext.Provider value={{ 
+      hostings, 
+      addHosting, 
+      removeHosting,
+      loading,
+      error
+    }}>
       {children}
     </HostingContext.Provider>
   );

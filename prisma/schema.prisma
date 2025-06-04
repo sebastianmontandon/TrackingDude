@@ -1,0 +1,63 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Domain {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  creationDate   DateTime
+  website        String
+  paymentPeriod  String
+  expirationDate DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("domains")
+}
+
+model Hosting {
+  id               String   @id @default(cuid())
+  domain           String
+  provider         String
+  paymentType      String
+  includesHosting  Boolean
+  registrationDate DateTime
+  baseCost         Float
+  maintenanceFee   Float
+  totalCost        Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@map("hostings")
+}
+
+model Notification {
+  id                 String             @id @default(cuid())
+  type               NotificationType
+  domain             String
+  provider           String
+  notificationDate   DateTime
+  notificationMethod NotificationMethod
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  DOMAIN
+  HOSTING
+}
+
+enum NotificationMethod {
+  EMAIL
+  WHATSAPP
+} 

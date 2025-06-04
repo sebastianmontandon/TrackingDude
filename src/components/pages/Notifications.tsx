@@ -1,11 +1,18 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Bell, Plus, Mail, MessageSquare, Smartphone } from 'lucide-react'
+import React, { useState, useEffect } from 'react'
+import { Bell, Plus, Mail, MessageSquare, Calendar } from 'lucide-react'
 import NotificationTable from '../NotificationTable'
 import { useNotificationContext } from '../../contexts/NotificationContext'
 import { useDomainContext } from '../../contexts/DomainContext'
 import { useHostingContext } from '../../contexts/HostingContext'
+import { 
+  getTodayDateString, 
+  calculateExpirationDate, 
+  calculateHostingExpirationDate, 
+  subtractDaysFromDate,
+  formatDateForInput
+} from '../../lib/utils'
 
 const NotificationConfigForm: React.FC = () => {
   const { addNotification } = useNotificationContext()
@@ -14,16 +21,58 @@ const NotificationConfigForm: React.FC = () => {
   
   const [type, setType] = useState<'domain' | 'hosting'>('domain')
   const [selectedService, setSelectedService] = useState('')
-  const [notificationDate, setNotificationDate] = useState(new Date().toISOString().split('T')[0])
+  const [notificationDate, setNotificationDate] = useState(getTodayDateString())
   const [notificationMethod, setNotificationMethod] = useState('Email')
+  const [calculatedExpirationDate, setCalculatedExpirationDate] = useState('')
   
   const getAvailableServices = () => {
     return type === 'domain' 
-      ? domains.map(d => ({ id: d.id, name: d.name, provider: d.website }))
-      : hostings.map(h => ({ id: h.id, name: h.domain, provider: h.provider }))
+      ? domains.map(d => ({ 
+          id: d.id, 
+          name: d.name, 
+          provider: d.website,
+          // Para dominios, usar expirationDate si existe, sino calcular
+          expirationDate: d.expirationDate || calculateExpirationDate(d.creationDate, d.paymentPeriod),
+          creationDate: d.creationDate,
+          paymentPeriod: d.paymentPeriod
+        }))
+      : hostings.map(h => ({ 
+          id: h.id, 
+          name: h.domain, 
+          provider: h.provider,
+          // Para hostings, calcular fecha de vencimiento
+          expirationDate: calculateHostingExpirationDate(h.registrationDate, h.paymentType),
+          registrationDate: h.registrationDate,
+          paymentType: h.paymentType
+        }))
   }
+
+  // Efecto para calcular la fecha de notificación cuando cambia el servicio seleccionado
+  useEffect(() => {
+    if (selectedService) {
+      const services = getAvailableServices()
+      const service = services.find(s => s.id === selectedService)
+      
+      if (service && service.expirationDate) {
+        // Calcular fecha de vencimiento - 1 día
+        const notificationDateCalculated = subtractDaysFromDate(service.expirationDate, 1)
+        setNotificationDate(notificationDateCalculated)
+        setCalculatedExpirationDate(service.expirationDate)
+      }
+    } else {
+      setNotificationDate(getTodayDateString())
+      setCalculatedExpirationDate('')
+    }
+  }, [selectedService, type, domains, hostings])
+
+  // Efecto para resetear selección cuando cambia el tipo
+  useEffect(() => {
+    setSelectedService('')
+    setNotificationDate(getTodayDateString())
+    setCalculatedExpirationDate('')
+  }, [type])
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!selectedService || !notificationDate || !notificationMethod) {
@@ -34,25 +83,29 @@ const NotificationConfigForm: React.FC = () => {
     const service = services.find(s => s.id === selectedService)
     
     if (service) {
-      addNotification({
-        type,
-        domain: service.name,
-        provider: service.provider,
-        notificationDate,
-        notificationMethod,
-      })
-      
-      // Reset form
-      setSelectedService('')
-      setNotificationDate(new Date().toISOString().split('T')[0])
-      setNotificationMethod('Email')
+      try {
+        await addNotification({
+          type,
+          domain: service.name,
+          provider: service.provider,
+          notificationDate,
+          notificationMethod,
+        })
+        
+        // Reset form
+        setSelectedService('')
+        setNotificationDate(getTodayDateString())
+        setNotificationMethod('Email')
+        setCalculatedExpirationDate('')
+      } catch (error) {
+        console.error('Error al agregar notificación:', error);
+      }
     }
   }
   
   const getMethodIcon = (method: string) => {
     switch (method) {
       case 'Email': return <Mail size={16} />
-      case 'SMS': return <Smartphone size={16} />
       case 'WhatsApp': return <MessageSquare size={16} />
       default: return <Bell size={16} />
     }
@@ -83,47 +136,51 @@ const NotificationConfigForm: React.FC = () => {
           </select>
         </div>
 
-        {/* Grid responsive */}
-        <div className="form-grid">
-          <div className="form-group">
-            <label htmlFor="service-select" className="form-label">
-              {type === 'domain' ? 'Dominio' : 'Servicio de Hosting'} *
-            </label>
-            <select
-              id="service-select"
-              value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
-              className="form-input"
-              required
-            >
-              <option value="">Selecciona {type === 'domain' ? 'un dominio' : 'un servicio'}</option>
-              {getAvailableServices().map(service => (
-                <option key={service.id} value={service.id}>{service.name}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="form-group">
-            <label htmlFor="notification-date" className="form-label">
-              Fecha de notificación *
-            </label>
-            <input
-              id="notification-date"
-              type="date"
-              value={notificationDate}
-              onChange={(e) => setNotificationDate(e.target.value)}
-              className="form-input"
-              required
-            />
-          </div>
+        {/* Selector de servicio */}
+        <div className="form-group">
+          <label htmlFor="service-select" className="form-label">
+            {type === 'domain' ? 'Dominio' : 'Servicio de Hosting'} *
+          </label>
+          <select
+            id="service-select"
+            value={selectedService}
+            onChange={(e) => setSelectedService(e.target.value)}
+            className="form-input"
+            required
+          >
+            <option value="">Selecciona {type === 'domain' ? 'un dominio' : 'un servicio'}</option>
+            {getAvailableServices().map(service => (
+              <option key={service.id} value={service.id}>{service.name}</option>
+            ))}
+          </select>
+          {selectedService && calculatedExpirationDate && (
+            <div className="mt-2 p-3 bg-blue-950/40 rounded-lg border border-blue-800">
+              <div className="flex items-center gap-2 text-sm">
+                <Calendar size={14} className="text-blue-400" />
+                <span className="text-blue-300">
+                  <strong>Fecha de vencimiento:</strong> {calculatedExpirationDate}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-sm mt-1">
+                <Bell size={14} className="text-green-400" />
+                <span className="text-green-300">
+                  <strong>Notificación programada para:</strong> {notificationDate}
+                </span>
+              </div>
+              <p className="text-xs text-blue-400 mt-1">
+                La notificación se enviará automáticamente 1 día antes del vencimiento
+              </p>
+            </div>
+          )}
         </div>
 
+        {/* Método de notificación - solo Email y WhatsApp */}
         <fieldset className="form-group">
           <legend className="form-label">
             Método de notificación *
           </legend>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
-            {['Email', 'SMS', 'WhatsApp', 'Push'].map(method => (
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {['Email', 'WhatsApp'].map(method => (
               <label 
                 key={method} 
                 htmlFor={`method-${method.toLowerCase()}`}
@@ -177,7 +234,8 @@ export default function Notifications() {
         <div className="section-header">
           <h2 className="section-title">Configurar Nueva Notificación</h2>
           <p className="section-description">
-            Programa notificaciones personalizadas para tus dominios y servicios de hosting
+            Programa notificaciones personalizadas para tus dominios y servicios de hosting. 
+            La fecha se calcula automáticamente como fecha de vencimiento - 1 día.
           </p>
         </div>
         <NotificationConfigForm />

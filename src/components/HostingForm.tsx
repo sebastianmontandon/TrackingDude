@@ -3,42 +3,61 @@
 import React, { useState } from 'react';
 import { Server, Plus } from 'lucide-react';
 import { useHostingContext } from '../contexts/HostingContext';
-import { useDomainContext } from '../contexts/DomainContext';
+import { getTodayDateString } from '../lib/utils';
 
 const HostingForm: React.FC = () => {
   const { addHosting } = useHostingContext();
-  const { domains } = useDomainContext();
   
   const [domain, setDomain] = useState('');
   const [provider, setProvider] = useState('');
   const [paymentType, setPaymentType] = useState('Monthly');
   const [includesHosting, setIncludesHosting] = useState(true);
-  const [registrationDate, setRegistrationDate] = useState(new Date().toISOString().split('T')[0]);
+  const [registrationDate, setRegistrationDate] = useState(getTodayDateString());
   const [baseCost, setBaseCost] = useState('');
   
-  const handleSubmit = (e: React.FormEvent) => {
+  // Obtener la fecha actual en formato YYYY-MM-DD para restricción
+  const today = getTodayDateString();
+  
+  const handleIncludesHostingChange = (checked: boolean) => {
+    setIncludesHosting(checked);
+    // Si se desmarca el checkbox, limpiar el campo dominio
+    if (!checked) {
+      setDomain('');
+    }
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!domain || !provider || !paymentType || !registrationDate || !baseCost) {
+    if (!provider || !paymentType || !registrationDate || !baseCost) {
       return;
     }
     
-    addHosting({
-      domain,
-      provider,
-      paymentType,
-      includesHosting,
-      registrationDate,
-      baseCost: parseFloat(baseCost),
-    });
+    // Solo requerir dominio si includesHosting está marcado
+    if (includesHosting && !domain) {
+      return;
+    }
     
-    // Reset form
-    setDomain('');
-    setProvider('');
-    setPaymentType('Monthly');
-    setIncludesHosting(true);
-    setRegistrationDate(new Date().toISOString().split('T')[0]);
-    setBaseCost('');
+    try {
+      await addHosting({
+        domain: includesHosting ? domain : '',
+        provider,
+        paymentType,
+        includesHosting,
+        registrationDate,
+        baseCost: parseFloat(baseCost),
+      });
+      
+      // Reset form
+      setDomain('');
+      setProvider('');
+      setPaymentType('Monthly');
+      setIncludesHosting(true);
+      setRegistrationDate(getTodayDateString());
+      setBaseCost('');
+    } catch (error) {
+      console.error('Error al agregar hosting:', error);
+    }
   };
   
   return (
@@ -49,25 +68,40 @@ const HostingForm: React.FC = () => {
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        {/* Selección de dominio */}
+        {/* Checkbox para hosting incluido - movido arriba */}
+        <div className="flex items-start space-x-3">
+          <input
+            type="checkbox"
+            id="includes-hosting"
+            checked={includesHosting}
+            onChange={(e) => handleIncludesHostingChange(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-primary"
+          />
+          <label htmlFor="includes-hosting" className="text-sm text-muted-foreground leading-relaxed">
+            El servicio incluye hosting web (no solo dominio)
+          </label>
+        </div>
+
+        {/* Campo de dominio libre - condicionalmente habilitado */}
         <div className="form-group">
           <label htmlFor="domain" className="form-label">
-            Dominio *
+            Dominio {includesHosting && '*'}
           </label>
-          <select
+          <input
             id="domain"
+            type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            className="form-input"
-            required
-          >
-            <option value="">Selecciona un dominio</option>
-            {domains.map(d => (
-              <option key={d.id} value={d.name}>{d.name}</option>
-            ))}
-          </select>
+            className={`form-input ${!includesHosting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            placeholder={includesHosting ? "ejemplo.com" : "No se requiere dominio"}
+            disabled={!includesHosting}
+            required={includesHosting}
+          />
           <p className="text-xs text-muted-foreground mt-1">
-            Selecciona el dominio para el cual configurarás el hosting
+            {includesHosting 
+              ? "Ingresa el nombre del dominio para el cual configurarás el hosting"
+              : "Campo deshabilitado porque el servicio no incluye hosting web"
+            }
           </p>
         </div>
 
@@ -106,20 +140,6 @@ const HostingForm: React.FC = () => {
           </div>
         </div>
 
-        {/* Checkbox para hosting incluido */}
-        <div className="flex items-start space-x-3">
-          <input
-            type="checkbox"
-            id="includes-hosting"
-            checked={includesHosting}
-            onChange={(e) => setIncludesHosting(e.target.checked)}
-            className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-primary"
-          />
-          <label htmlFor="includes-hosting" className="text-sm text-muted-foreground leading-relaxed">
-            El servicio incluye hosting web (no solo dominio)
-          </label>
-        </div>
-
         {/* Grid responsive de fecha y costo */}
         <div className="form-grid">
           <div className="form-group">
@@ -131,9 +151,13 @@ const HostingForm: React.FC = () => {
               type="date"
               value={registrationDate}
               onChange={(e) => setRegistrationDate(e.target.value)}
+              max={today}
               className="form-input"
               required
             />
+            <p className="text-xs text-muted-foreground mt-1">
+              Solo se permiten fechas hasta el día de hoy
+            </p>
           </div>
           
           <div className="form-group">
@@ -164,7 +188,7 @@ const HostingForm: React.FC = () => {
           <button
             type="submit"
             className="btn-primary w-full sm:w-auto min-w-[120px]"
-            disabled={!domain || !provider || !paymentType || !registrationDate || !baseCost}
+            disabled={!provider || !paymentType || !registrationDate || !baseCost || (includesHosting && !domain)}
           >
             Agregar Hosting
           </button>

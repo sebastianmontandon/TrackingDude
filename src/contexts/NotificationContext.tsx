@@ -79,7 +79,7 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
   const removeNotification = async (id: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/notifications?id=${id}`, {
+      const response = await fetch(`/api/notifications/${id}`, {
         method: 'DELETE',
       });
 
@@ -87,7 +87,9 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         throw new Error('Error al eliminar notificación');
       }
 
-      setNotifications(prevNotifications => prevNotifications.filter(notification => notification.id !== id));
+      setNotifications(prevNotifications => 
+        prevNotifications.filter(notification => notification.id !== id)
+      );
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');

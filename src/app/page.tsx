@@ -1,6 +1,8 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Sidebar from '../components/Sidebar'
 import NewDashboard from '../components/pages/NewDashboard'
 import Dashboard from '../components/pages/Dashboard'
@@ -10,6 +12,7 @@ import LoadingModal from '../components/LoadingModal'
 import { DomainProvider, useDomainContext } from '../contexts/DomainContext'
 import { HostingProvider, useHostingContext } from '../contexts/HostingContext'
 import { NotificationProvider, useNotificationContext } from '../contexts/NotificationContext'
+import { LogOut, User } from 'lucide-react'
 
 // Componente interno que tiene acceso a los contextos
 const AppContent: React.FC = () => {
@@ -97,14 +100,62 @@ const AppContent: React.FC = () => {
   );
 };
 
-export default function Home() {
+// Header component with user info
+const UserHeader: React.FC<{ user: any }> = ({ user }) => {
   return (
-    <DomainProvider>
-      <HostingProvider>
-        <NotificationProvider>
-          <AppContent />
-        </NotificationProvider>
-      </HostingProvider>
-    </DomainProvider>
+    <div className="bg-card border-b border-border p-4 flex items-center justify-between">
+      <button
+        onClick={() => signOut()}
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+      >
+        <LogOut className="h-4 w-4" />
+        Cerrar Sesión
+      </button>
+    </div>
+  );
+};
+
+export default function Home() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin')
+    }
+  }, [status, router])
+
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Verificando autenticación...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Redirigiendo al login...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="h-full">
+      <UserHeader user={session?.user} />
+      <DomainProvider>
+        <HostingProvider>
+          <NotificationProvider>
+            <AppContent />
+          </NotificationProvider>
+        </HostingProvider>
+      </DomainProvider>
+    </div>
   )
 } 

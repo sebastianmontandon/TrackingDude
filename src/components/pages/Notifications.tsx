@@ -1,11 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Bell, Plus, Mail, MessageSquare, Calendar } from 'lucide-react'
+import { Bell, Plus, Mail, MessageSquare, Calendar, Send, TestTube } from 'lucide-react'
 import NotificationTable from '../NotificationTable'
 import { useNotificationContext } from '../../contexts/NotificationContext'
 import { useDomainContext } from '../../contexts/DomainContext'
 import { useHostingContext } from '../../contexts/HostingContext'
+import { useSession } from 'next-auth/react'
 import { 
   getTodayDateString, 
   calculateExpirationDate, 
@@ -250,6 +251,203 @@ const NotificationDebug: React.FC = () => {
   );
 };
 
+// Component for testing notifications
+const NotificationTester: React.FC = () => {
+  const { data: session } = useSession()
+  const [testEmail, setTestEmail] = useState('')
+  const [testPhone, setTestPhone] = useState('')
+  const [isTestingEmail, setIsTestingEmail] = useState(false)
+  const [isTestingWhatsApp, setIsTestingWhatsApp] = useState(false)
+  const [emailResult, setEmailResult] = useState<string | null>(null)
+  const [whatsappResult, setWhatsappResult] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (session?.user?.email) {
+      setTestEmail(session.user.email)
+    }
+    if (session?.user?.phone) {
+      setTestPhone(session.user.phone)
+    }
+  }, [session])
+
+  const handleTestEmail = async () => {
+    if (!testEmail) return
+    
+    setIsTestingEmail(true)
+    setEmailResult(null)
+    
+    try {
+      const response = await fetch('/api/notifications/test/email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: testEmail }),
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        setEmailResult(`✅ Email enviado exitosamente. ID: ${data.messageId}`)
+      } else {
+        setEmailResult(`❌ Error: ${data.error}`)
+      }
+    } catch (error) {
+      setEmailResult('❌ Error de conexión')
+    } finally {
+      setIsTestingEmail(false)
+    }
+  }
+
+  const handleTestWhatsApp = async () => {
+    if (!testPhone) return
+    
+    setIsTestingWhatsApp(true)
+    setWhatsappResult(null)
+    
+    try {
+      const response = await fetch('/api/notifications/test/whatsapp', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ phone: testPhone }),
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        setWhatsappResult(`✅ WhatsApp enviado exitosamente. ID: ${data.messageId}`)
+      } else {
+        setWhatsappResult(`❌ Error: ${data.error}`)
+      }
+    } catch (error) {
+      setWhatsappResult('❌ Error de conexión')
+    } finally {
+      setIsTestingWhatsApp(false)
+    }
+  }
+
+  return (
+    <div className="form-section">
+      <div className="flex items-center gap-2 mb-4 sm:mb-6">
+        <TestTube className="h-5 w-5 text-primary" />
+        <h3 className="text-lg font-semibold text-foreground">Probar Notificaciones</h3>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Email Test */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <Mail className="h-5 w-5 text-primary" />
+            <h4 className="font-medium text-foreground">Prueba de Email</h4>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="test-email" className="form-label">
+              Email de destino
+            </label>
+            <input
+              id="test-email"
+              type="email"
+              value={testEmail}
+              onChange={(e) => setTestEmail(e.target.value)}
+              className="form-input"
+              placeholder="tu@email.com"
+            />
+          </div>
+          
+          <button
+            onClick={handleTestEmail}
+            disabled={!testEmail || isTestingEmail}
+            className="btn-primary w-full flex items-center justify-center gap-2"
+          >
+            {isTestingEmail ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Enviar Email de Prueba
+              </>
+            )}
+          </button>
+          
+          {emailResult && (
+            <div className={`p-3 rounded-lg text-sm border ${
+              emailResult.startsWith('✅') 
+                ? 'bg-green-500/10 text-green-600 border-green-500/20' 
+                : 'bg-destructive/10 text-destructive border-destructive/20'
+            }`}>
+              {emailResult}
+            </div>
+          )}
+        </div>
+
+        {/* WhatsApp Test */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <MessageSquare className="h-5 w-5 text-primary" />
+            <h4 className="font-medium text-foreground">Prueba de WhatsApp</h4>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="test-phone" className="form-label">
+              Número de teléfono
+            </label>
+            <input
+              id="test-phone"
+              type="tel"
+              value={testPhone}
+              onChange={(e) => setTestPhone(e.target.value)}
+              className="form-input"
+              placeholder="+34123456789"
+            />
+          </div>
+          
+          <button
+            onClick={handleTestWhatsApp}
+            disabled={!testPhone || isTestingWhatsApp}
+            className="btn-primary w-full flex items-center justify-center gap-2"
+          >
+            {isTestingWhatsApp ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                Enviando...
+              </>
+            ) : (
+              <>
+                <Send className="h-4 w-4" />
+                Enviar WhatsApp de Prueba
+              </>
+            )}
+          </button>
+          
+          {whatsappResult && (
+            <div className={`p-3 rounded-lg text-sm border ${
+              whatsappResult.startsWith('✅') 
+                ? 'bg-green-500/10 text-green-600 border-green-500/20' 
+                : 'bg-destructive/10 text-destructive border-destructive/20'
+            }`}>
+              {whatsappResult}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <div className="mt-6 p-4 bg-muted/20 rounded-lg border border-border">
+        <h4 className="font-medium text-foreground mb-2">Configuración Requerida</h4>
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p><strong>Email:</strong> Variables de entorno EMAIL_USER y EMAIL_PASSWORD</p>
+          <p><strong>WhatsApp:</strong> Variables de entorno TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN y TWILIO_WHATSAPP_FROM</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Notifications() {
   return (
     <div className="page-container">
@@ -306,6 +504,17 @@ export default function Notifications() {
         <NotificationDebug />
       </div>
       */}
+      
+      {/* Notification Testing Section */}
+      <div className="content-section">
+        <div className="section-header">
+          <h2 className="section-title">Probar Notificaciones</h2>
+          <p className="section-description">
+            Prueba la configuración de notificaciones antes de enviarlas a los usuarios.
+          </p>
+        </div>
+        <NotificationTester />
+      </div>
     </div>
   )
 } 

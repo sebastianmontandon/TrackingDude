@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   try {
     const prisma = await getPrisma()
     const body = await request.json()
-    const { name, creationDate, website, paymentPeriod } = body
+    const { name, creationDate, website, paymentPeriod, baseCost, maintenanceFee, totalCost } = body
 
     // Calcular la fecha de expiración basada en el período de pago
     let daysToAdd = 365 // Por defecto 1 año
@@ -55,7 +55,10 @@ export async function POST(request: NextRequest) {
         creationDate: new Date(creationDate),
         website,
         paymentPeriod,
-        expirationDate
+        expirationDate,
+        baseCost,
+        maintenanceFee,
+        totalCost
       }
     })
 

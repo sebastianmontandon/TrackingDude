@@ -17,6 +17,9 @@ model Domain {
   website        String
   paymentPeriod  String
   expirationDate DateTime
+  baseCost       Float
+  maintenanceFee Float
+  totalCost      Float
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

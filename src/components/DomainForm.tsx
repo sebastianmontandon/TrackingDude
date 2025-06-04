@@ -11,6 +11,7 @@ const DomainForm: React.FC = () => {
   const [creationDate, setCreationDate] = useState(getTodayDateString());
   const [website, setWebsite] = useState('');
   const [paymentPeriod, setPaymentPeriod] = useState('1 year');
+  const [baseCost, setBaseCost] = useState('');
   const [checkAvailability, setCheckAvailability] = useState(false);
   
   const [isChecking, setIsChecking] = useState(false);
@@ -36,16 +37,23 @@ const DomainForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!name || !creationDate || !website || !paymentPeriod) {
+    if (!name || !creationDate || !website || !paymentPeriod || !baseCost) {
       return;
     }
     
     try {
+      const baseCostNum = parseFloat(baseCost);
+      const maintenanceFee = baseCostNum * 0.2; // 20% de mantenimiento
+      const totalCost = baseCostNum + maintenanceFee;
+      
       await addDomain({
         name,
         creationDate,
         website,
         paymentPeriod,
+        baseCost: baseCostNum,
+        maintenanceFee,
+        totalCost,
       });
       
       // Reset form
@@ -53,6 +61,7 @@ const DomainForm: React.FC = () => {
       setCreationDate(getTodayDateString());
       setWebsite('');
       setPaymentPeriod('1 year');
+      setBaseCost('');
       setIsAvailable(null);
     } catch (error) {
       console.error('Error al agregar dominio:', error);
@@ -157,29 +166,54 @@ const DomainForm: React.FC = () => {
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="website" className="form-label">
-            Sitio web de registro *
-          </label>
-          <input
-            id="website"
-            type="url"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            className="form-input"
-            placeholder="https://ejemplo.com"
-            required
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            URL del proveedor donde registraste el dominio
-          </p>
+        <div className="form-grid">
+          <div className="form-group">
+            <label htmlFor="website" className="form-label">
+              Sitio web de registro *
+            </label>
+            <input
+              id="website"
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              className="form-input"
+              placeholder="https://ejemplo.com"
+              required
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              URL del proveedor donde registraste el dominio
+            </p>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="base-cost" className="form-label">
+              Costo base *
+            </label>
+            <div className="relative">
+              <input
+                id="base-cost"
+                type="number"
+                value={baseCost}
+                onChange={(e) => setBaseCost(e.target.value)}
+                className="form-input pl-8"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+                required
+              />
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Se calculará automáticamente una tarifa de mantenimiento del 20%
+            </p>
+          </div>
         </div>
         
         <div className="flex flex-col sm:flex-row justify-end pt-4 gap-3">
           <button
             type="submit"
             className="btn-primary w-full sm:w-auto min-w-[120px]"
-            disabled={!name || !creationDate || !website || !paymentPeriod || (checkAvailability && isAvailable === false)}
+            disabled={!name || !creationDate || !website || !paymentPeriod || !baseCost || (checkAvailability && isAvailable === false)}
           >
             Agregar Dominio
           </button>

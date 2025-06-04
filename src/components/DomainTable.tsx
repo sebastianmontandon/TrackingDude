@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Trash2, ArrowUpDown, Info, AlertCircle, ExternalLink, Globe } from 'lucide-react';
+import { Trash2, ArrowUpDown, Info, AlertCircle, ExternalLink, Globe, DollarSign } from 'lucide-react';
 import { useDomainContext, Domain } from '../contexts/DomainContext';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -40,6 +40,15 @@ const DomainTable: React.FC = () => {
       
       return sortDirection === 'asc' ? comparison : -comparison;
     });
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
   };
 
   const getExpirationStatus = (expirationDate: string) => {
@@ -141,6 +150,33 @@ const DomainTable: React.FC = () => {
                     <ArrowUpDown size={14} />
                   </div>
                 </th>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-base-cost hidden md:table-cell"
+                  onClick={() => handleSort('baseCost')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Base</span>
+                    <ArrowUpDown size={12} />
+                  </div>
+                </th>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-maintenance hidden xl:table-cell"
+                >
+                  <span>Mant.</span>
+                </th>
+                <th 
+                  scope="col" 
+                  className="table-header-cell col-total"
+                  onClick={() => handleSort('totalCost')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span className="hidden sm:inline">Total</span>
+                    <span className="sm:hidden">$</span>
+                    <ArrowUpDown size={12} />
+                  </div>
+                </th>
                 <th scope="col" className="table-header-cell col-actions">
                   <span className="sr-only">Acciones</span>
                 </th>
@@ -213,6 +249,29 @@ const DomainTable: React.FC = () => {
                         </div>
                       </div>
                     </td>
+                    <td className="table-cell col-base-cost hidden md:table-cell">
+                      <div className="table-cell-text-secondary text-xs truncate">
+                        {formatCurrency(domain.baseCost || 0)}
+                      </div>
+                    </td>
+                    <td className="table-cell col-maintenance hidden xl:table-cell">
+                      <div className="text-xs text-green-600 dark:text-green-400 truncate">
+                        {formatCurrency(domain.maintenanceFee || 0)}
+                      </div>
+                    </td>
+                    <td className="table-cell col-total">
+                      <div className="min-w-0">
+                        <div className="table-cell-text font-semibold text-primary truncate text-sm">
+                          {formatCurrency(domain.totalCost || 0)}
+                        </div>
+                        <div className="md:hidden table-cell-text-secondary text-xs mt-1">
+                          <div className="flex items-center gap-1">
+                            <DollarSign className="h-3 w-3 flex-shrink-0" />
+                            <span className="truncate">Base: {formatCurrency(domain.baseCost || 0)}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
                     <td className="table-cell col-actions text-right">
                       <button
                         onClick={() => handleDeleteClick(domain.id, domain.name)}
@@ -227,7 +286,7 @@ const DomainTable: React.FC = () => {
               })}
               {domains.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="table-cell text-center text-muted-foreground py-8">
+                  <td colSpan={9} className="table-cell text-center text-muted-foreground py-8">
                     <div className="flex flex-col items-center space-y-2">
                       <Globe className="w-8 h-8 text-muted-foreground/50" />
                       <span>No hay dominios registrados</span>

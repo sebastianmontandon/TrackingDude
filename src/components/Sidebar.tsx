@@ -29,8 +29,8 @@ const NavItem: React.FC<NavItemProps> = ({ icon, label, active = false, onClick 
 };
 
 interface SidebarProps {
-  onNavigate: (page: 'domains' | 'hosting' | 'notifications') => void;
-  currentPage: 'domains' | 'hosting' | 'notifications';
+  onNavigate: (page: 'dashboard' | 'domains' | 'hosting' | 'notifications') => void;
+  currentPage: 'dashboard' | 'domains' | 'hosting' | 'notifications';
   onClose?: () => void;
 }
 
@@ -72,6 +72,12 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose }) =
             <NavItem 
               icon={<Home size={18} />} 
               label="Dashboard" 
+              active={currentPage === 'dashboard'}
+              onClick={() => onNavigate('dashboard')}
+            />
+            <NavItem 
+              icon={<Globe size={18} />} 
+              label="Dominios" 
               active={currentPage === 'domains'}
               onClick={() => onNavigate('domains')}
             />

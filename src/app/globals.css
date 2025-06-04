@@ -271,28 +271,43 @@
   }
 
   .domains-table .col-name {
-    width: 25%;
+    width: 20%;
     min-width: 150px;
   }
 
   .domains-table .col-creation {
-    width: 15%;
+    width: 12%;
     min-width: 110px;
   }
 
   .domains-table .col-website {
-    width: 25%;
+    width: 20%;
     min-width: 180px;
   }
 
   .domains-table .col-period {
-    width: 12%;
+    width: 10%;
     min-width: 90px;
   }
 
   .domains-table .col-expiration {
-    width: 18%;
+    width: 15%;
     min-width: 130px;
+  }
+
+  .domains-table .col-base-cost {
+    width: 10%;
+    min-width: 80px;
+  }
+
+  .domains-table .col-maintenance {
+    width: 10%;
+    min-width: 80px;
+  }
+
+  .domains-table .col-total {
+    width: 8%;
+    min-width: 70px;
   }
 
   .domains-table .col-actions {

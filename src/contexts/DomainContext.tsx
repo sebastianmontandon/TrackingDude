@@ -10,6 +10,9 @@ export interface Domain {
   website: string;
   paymentPeriod: string;
   expirationDate: string;
+  baseCost: number;
+  maintenanceFee: number;
+  totalCost: number;
 }
 
 interface DomainContextType {

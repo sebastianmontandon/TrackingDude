@@ -1,7 +1,6 @@
 'use client'
 
 import React from 'react'
-import StatisticsCards from '../StatisticsCards'
 import DomainForm from '../DomainForm'
 import DomainTable from '../DomainTable'
 
@@ -10,23 +9,10 @@ export default function Dashboard() {
     <div className="page-container">
       {/* Header */}
       <div className="section-header">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Dashboard de Dominios</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Gestión de Dominios</h1>
         <p className="section-description">
-          Gestiona y supervisa todos tus dominios desde aquí. Mantén un control completo de tus activos digitales.
+          Gestiona y supervisa todos tus dominios desde aquí. Mantén un control completo de tus activos digitales y sus costos.
         </p>
-      </div>
-      
-      {/* Statistics Cards */}
-      <div className="content-section">
-        <div className="section-header">
-          <h2 className="section-title">Resumen General</h2>
-          <p className="section-description">
-            Vista general del estado de todos tus dominios
-          </p>
-        </div>
-        <div className="stats-grid">
-          <StatisticsCards />
-        </div>
       </div>
       
       {/* Domain Form Section */}
@@ -45,7 +31,7 @@ export default function Dashboard() {
         <div className="section-header">
           <h2 className="section-title">Lista de Dominios</h2>
           <p className="section-description">
-            Todos tus dominios registrados con información detallada
+            Todos tus dominios registrados con información detallada y costos
           </p>
         </div>
         <DomainTable />

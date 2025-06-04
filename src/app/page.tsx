@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Sidebar from '../components/Sidebar'
+import NewDashboard from '../components/pages/NewDashboard'
 import Dashboard from '../components/pages/Dashboard'
 import Hosting from '../components/pages/Hosting'
 import Notifications from '../components/pages/Notifications'
@@ -12,7 +13,7 @@ import { NotificationProvider, useNotificationContext } from '../contexts/Notifi
 
 // Componente interno que tiene acceso a los contextos
 const AppContent: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<'domains' | 'hosting' | 'notifications'>('domains');
+  const [currentPage, setCurrentPage] = useState<'dashboard' | 'domains' | 'hosting' | 'notifications'>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   
   // Estados de loading de todos los contextos
@@ -23,7 +24,7 @@ const AppContent: React.FC = () => {
   // Mostrar loading si alguno de los contextos está cargando
   const isLoading = domainsLoading || hostingsLoading || notificationsLoading;
 
-  const handleNavigate = (page: 'domains' | 'hosting' | 'notifications') => {
+  const handleNavigate = (page: 'dashboard' | 'domains' | 'hosting' | 'notifications') => {
     setCurrentPage(page);
     // Cerrar sidebar en móvil después de navegar
     setSidebarOpen(false);
@@ -31,6 +32,8 @@ const AppContent: React.FC = () => {
 
   const renderCurrentPage = () => {
     switch (currentPage) {
+      case 'dashboard':
+        return <NewDashboard />;
       case 'domains':
         return <Dashboard />;
       case 'hosting':
@@ -38,7 +41,7 @@ const AppContent: React.FC = () => {
       case 'notifications':
         return <Notifications />;
       default:
-        return <Dashboard />;
+        return <NewDashboard />;
     }
   };
 

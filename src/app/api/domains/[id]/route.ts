@@ -1,3 +1,5 @@
+'use server'
+
 import { NextRequest, NextResponse } from 'next/server'
 
 // Importación dinámica de Prisma para evitar problemas en build

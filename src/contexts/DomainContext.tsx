@@ -81,7 +81,7 @@ export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const removeDomain = async (id: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/domains/${id}`, {
+      const response = await fetch(`/api/domains?id=${id}`, {
         method: 'DELETE',
       });
 

@@ -82,7 +82,7 @@ export const HostingProvider: React.FC<{ children: ReactNode }> = ({ children })
   const removeHosting = async (id: string) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/hostings/${id}`, {
+      const response = await fetch(`/api/hostings?id=${id}`, {
         method: 'DELETE',
       });
 

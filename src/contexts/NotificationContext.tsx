@@ -4,11 +4,11 @@ import React, { createContext, useState, useContext, ReactNode, useEffect } from
 
 export interface Notification {
   id: string;
-  type: 'domain' | 'hosting';
+  type: 'DOMAIN' | 'HOSTING';
   domain: string;
   provider: string;
   notificationDate: string;
-  notificationMethod: string;
+  notificationMethod: 'EMAIL' | 'WHATSAPP';
 }
 
 interface NotificationContextType {

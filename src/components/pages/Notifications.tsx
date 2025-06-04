@@ -22,9 +22,14 @@ const NotificationConfigForm: React.FC = () => {
   const [type, setType] = useState<'domain' | 'hosting'>('domain')
   const [selectedService, setSelectedService] = useState('')
   const [notificationDate, setNotificationDate] = useState(getTodayDateString())
-  const [notificationMethod, setNotificationMethod] = useState('Email')
+  const [notificationMethod, setNotificationMethod] = useState<'EMAIL' | 'WHATSAPP'>('EMAIL')
   const [calculatedExpirationDate, setCalculatedExpirationDate] = useState('')
   
+  // Helper function to convert types
+  const convertType = (type: 'domain' | 'hosting'): 'DOMAIN' | 'HOSTING' => {
+    return type === 'domain' ? 'DOMAIN' : 'HOSTING';
+  };
+
   const getAvailableServices = () => {
     return type === 'domain' 
       ? domains.map(d => ({ 
@@ -85,7 +90,7 @@ const NotificationConfigForm: React.FC = () => {
     if (service) {
       try {
         await addNotification({
-          type,
+          type: convertType(type),
           domain: service.name,
           provider: service.provider,
           notificationDate,
@@ -95,7 +100,7 @@ const NotificationConfigForm: React.FC = () => {
         // Reset form
         setSelectedService('')
         setNotificationDate(getTodayDateString())
-        setNotificationMethod('Email')
+        setNotificationMethod('EMAIL')
         setCalculatedExpirationDate('')
       } catch (error) {
         console.error('Error al agregar notificación:', error);
@@ -105,8 +110,8 @@ const NotificationConfigForm: React.FC = () => {
   
   const getMethodIcon = (method: string) => {
     switch (method) {
-      case 'Email': return <Mail size={16} />
-      case 'WhatsApp': return <MessageSquare size={16} />
+      case 'EMAIL': return <Mail size={16} />
+      case 'WHATSAPP': return <MessageSquare size={16} />
       default: return <Bell size={16} />
     }
   }
@@ -180,24 +185,27 @@ const NotificationConfigForm: React.FC = () => {
             Método de notificación *
           </legend>
           <div className="grid grid-cols-2 gap-3 mt-2">
-            {['Email', 'WhatsApp'].map(method => (
+            {[
+              { value: 'EMAIL', label: 'Email' },
+              { value: 'WHATSAPP', label: 'WhatsApp' }
+            ].map(method => (
               <label 
-                key={method} 
-                htmlFor={`method-${method.toLowerCase()}`}
+                key={method.value} 
+                htmlFor={`method-${method.value.toLowerCase()}`}
                 className="flex items-center gap-2 p-3 rounded-lg border border-input cursor-pointer hover:bg-accent transition-colors"
               >
                 <input
                   type="radio"
-                  id={`method-${method.toLowerCase()}`}
+                  id={`method-${method.value.toLowerCase()}`}
                   name="notificationMethod"
-                  value={method}
-                  checked={notificationMethod === method}
-                  onChange={(e) => setNotificationMethod(e.target.value)}
+                  value={method.value}
+                  checked={notificationMethod === method.value}
+                  onChange={(e) => setNotificationMethod(e.target.value as 'EMAIL' | 'WHATSAPP')}
                   className="sr-only"
                 />
-                <div className={`flex items-center gap-2 ${notificationMethod === method ? 'text-primary' : 'text-muted-foreground'}`}>
-                  {getMethodIcon(method)}
-                  <span className="text-sm font-medium">{method}</span>
+                <div className={`flex items-center gap-2 ${notificationMethod === method.value ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {getMethodIcon(method.value)}
+                  <span className="text-sm font-medium">{method.label}</span>
                 </div>
               </label>
             ))}

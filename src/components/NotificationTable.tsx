@@ -23,8 +23,11 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
     notificationDomain: ''
   });
   
+  // Convert UI type to API type for filtering
+  const apiType = type === 'domain' ? 'DOMAIN' : 'HOSTING';
+  
   const filteredNotifications = notifications.filter(
-    notification => notification.type === type
+    notification => notification.type === apiType
   );
 
   const handleSort = (field: keyof Notification) => {
@@ -52,11 +55,11 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
     });
   };
 
-  const getNotificationMethodBadge = (method: string) => {
-    switch (method.toLowerCase()) {
-      case 'email':
+  const getNotificationMethodBadge = (method: 'EMAIL' | 'WHATSAPP') => {
+    switch (method) {
+      case 'EMAIL':
         return { color: 'bg-blue-500', label: 'Email' };
-      case 'whatsapp':
+      case 'WHATSAPP':
         return { color: 'bg-green-600', label: 'WhatsApp' };
       default:
         return { color: 'bg-gray-500', label: method };

@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.phone = user.phone
+        token.phone = user.phone || undefined
       }
       return token
     },

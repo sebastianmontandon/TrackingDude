@@ -403,7 +403,7 @@ const NotificationTester: React.FC = () => {
               value={testPhone}
               onChange={(e) => setTestPhone(e.target.value)}
               className="form-input"
-              placeholder="+59899999999"
+              placeholder=""
             />
           </div>
           

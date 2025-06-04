@@ -46,7 +46,33 @@
     overflow: hidden; /* Evitar scroll en body */
     @apply antialiased;
   }
-
+  
+  /* Estilos para el input de tipo date */
+  input[type="date"] {
+    color-scheme: dark;
+    background-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+  
+  /* Estilos para el ícono del date picker */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+  }
+  
+  /* Estilo para Firefox */
+  input[type="date"]::-moz-calendar-picker-indicator {
+    filter: invert(1) brightness(1);
+    cursor: pointer;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    opacity: 1;
+  }
+  
   /* Scrollbar personalizado */
   ::-webkit-scrollbar {
     width: 8px;

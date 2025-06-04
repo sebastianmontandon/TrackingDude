@@ -73,6 +73,8 @@ export const sendWhatsAppNotification = async (notification: WhatsAppNotificatio
 // Email templates
 export const generateDomainExpirationEmail = (domainName: string, expirationDate: string, provider: string) => {
   const subject = `⚠️ Dominio ${domainName} próximo a vencer`
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+  const favicon = `${baseUrl}/favicon.png`
   
   const html = `
     <!DOCTYPE html>
@@ -91,7 +93,7 @@ export const generateDomainExpirationEmail = (domainName: string, expirationDate
     <body>
       <div class="container">
         <div class="header">
-          <h1>🌐 TrackingDude</h1>
+          <h1><img style="width: 32px; height: 32px; vertical-align: middle; margin-right: 10px;" src="${favicon}" alt="" /> TrackingDude</h1>
           <h2>Notificación de Vencimiento</h2>
         </div>
         
@@ -103,13 +105,6 @@ export const generateDomainExpirationEmail = (domainName: string, expirationDate
         </div>
         
         <p>Tu dominio <strong>${domainName}</strong> vencerá el <strong>${expirationDate}</strong>. Es importante que renueves tu dominio antes de la fecha de vencimiento para evitar interrupciones en tu servicio.</p>
-        
-        <p>Te recomendamos que:</p>
-        <ul>
-          <li>Contactes a tu proveedor ${provider} para renovar el dominio</li>
-          <li>Verifiques que tus datos de pago estén actualizados</li>
-          <li>Considera configurar la renovación automática</li>
-        </ul>
         
         <div class="footer">
           <p>Este mensaje fue enviado automáticamente por TrackingDude</p>

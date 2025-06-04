@@ -1,3 +1,12 @@
 {
-  "/page": "app/page.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/.well-known/appspecific/com.chrome.devtools.json/route": "app/.well-known/appspecific/com.chrome.devtools.json/route.js",
+  "/api/.well-known/appspecific/com.chrome.devtools.json/route": "app/api/.well-known/appspecific/com.chrome.devtools.json/route.js",
+  "/api/domains/route": "app/api/domains/route.js",
+  "/page": "app/page.js",
+  "/api/hostings/route": "app/api/hostings/route.js",
+  "/api/hostings/[id]/route": "app/api/hostings/[id]/route.js",
+  "/api/notifications/[id]/route": "app/api/notifications/[id]/route.js",
+  "/api/notifications/route": "app/api/notifications/route.js",
+  "/api/domains/[id]/route": "app/api/domains/[id]/route.js"
 }

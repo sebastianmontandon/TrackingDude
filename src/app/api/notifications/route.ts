@@ -1,20 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
-import { NotificationType, NotificationMethod } from '@prisma/client'
+
+// Importación dinámica de Prisma para evitar problemas en build
+async function getPrisma() {
+  const { prisma } = await import('@/lib/prisma')
+  return prisma
+}
 
 export async function GET() {
   try {
+    const prisma = await getPrisma()
     const notifications = await prisma.notification.findMany({
       orderBy: {
         createdAt: 'desc'
       }
     })
 
-    // Formatear las fechas y enums para el frontend
-    const formattedNotifications = notifications.map(notification => ({
+    // Formatear las fechas para que coincidan con el formato esperado por el frontend
+    const formattedNotifications = notifications.map((notification: any) => ({
       ...notification,
-      type: notification.type.toLowerCase(),
-      notificationMethod: notification.notificationMethod.toLowerCase(),
       notificationDate: notification.notificationDate.toISOString().split('T')[0]
     }))
 
@@ -30,28 +33,23 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const prisma = await getPrisma()
     const body = await request.json()
     const { type, domain, provider, notificationDate, notificationMethod } = body
 
-    // Convertir los valores del frontend a los enums de la base de datos
-    const dbType = type.toUpperCase() as NotificationType
-    const dbMethod = notificationMethod.toUpperCase() as NotificationMethod
-
     const notification = await prisma.notification.create({
       data: {
-        type: dbType,
+        type,
         domain,
         provider,
         notificationDate: new Date(notificationDate),
-        notificationMethod: dbMethod
+        notificationMethod
       }
     })
 
-    // Formatear para el frontend
+    // Formatear las fechas para el frontend
     const formattedNotification = {
       ...notification,
-      type: notification.type.toLowerCase(),
-      notificationMethod: notification.notificationMethod.toLowerCase(),
       notificationDate: notification.notificationDate.toISOString().split('T')[0]
     }
 

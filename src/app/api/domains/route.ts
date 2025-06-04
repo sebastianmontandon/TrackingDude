@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { addDays } from 'date-fns'
+
+// Importación dinámica de Prisma para evitar problemas en build
+async function getPrisma() {
+  const { prisma } = await import('@/lib/prisma')
+  return prisma
+}
 
 export async function GET() {
   try {
+    const prisma = await getPrisma()
     const domains = await prisma.domain.findMany({
       orderBy: {
         createdAt: 'desc'
@@ -11,7 +17,7 @@ export async function GET() {
     })
 
     // Formatear las fechas para que coincidan con el formato esperado por el frontend
-    const formattedDomains = domains.map(domain => ({
+    const formattedDomains = domains.map((domain: any) => ({
       ...domain,
       creationDate: domain.creationDate.toISOString().split('T')[0],
       expirationDate: domain.expirationDate.toISOString().split('T')[0]
@@ -29,6 +35,7 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const prisma = await getPrisma()
     const body = await request.json()
     const { name, creationDate, website, paymentPeriod } = body
 

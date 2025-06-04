@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+
+// Importación dinámica de Prisma para evitar problemas en build
+async function getPrisma() {
+  const { prisma } = await import('@/lib/prisma')
+  return prisma
+}
 
 export async function DELETE(
   request: NextRequest,
@@ -7,6 +12,7 @@ export async function DELETE(
 ) {
   try {
     const { id } = params
+    const prisma = await getPrisma()
 
     await prisma.domain.delete({
       where: {

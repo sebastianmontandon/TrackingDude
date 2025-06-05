@@ -54,8 +54,8 @@ export default function SignIn() {
       <div className="max-w-md w-full space-y-8">
         <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
           <div className="text-center">
-            <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <LogIn className="h-8 w-8 text-primary" />
+            <div className="mx-auto h-18 w-18 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <img src="/favicon.png" alt="Logo" />
             </div>
             <h2 className="text-3xl font-bold text-foreground">Iniciar Sesión</h2>
             <p className="mt-2 text-muted-foreground">

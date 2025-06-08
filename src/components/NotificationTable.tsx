@@ -37,7 +37,7 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
         <div className="flex items-center justify-center py-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Cargando notificaciones...</p>
+            <p className="text-muted-foreground">Loading notifications...</p>
           </div>
         </div>
       </div>
@@ -139,10 +139,10 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                       <Server size={14} className="text-muted-foreground" />
                     )}
                     <span className="hidden sm:inline">
-                      {type === 'domain' ? 'Dominio' : 'Servicio'}
+                      {type === 'domain' ? 'Domain' : 'Service'}
                     </span>
                     <span className="sm:hidden">
-                      {type === 'domain' ? 'Dom.' : 'Serv.'}
+                      {type === 'domain' ? 'Dom.' : 'Svc.'}
                     </span>
                     <ArrowUpDown size={12} />
                   </div>
@@ -153,7 +153,7 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                   onClick={() => handleSort('provider')}
                 >
                   <div className="flex items-center gap-1">
-                    <span>Proveedor</span>
+                    <span>Provider</span>
                     <ArrowUpDown size={12} />
                   </div>
                 </th>
@@ -164,7 +164,7 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                 >
                   <div className="flex items-center gap-1">
                     <Calendar size={14} className="text-muted-foreground" />
-                    <span>Fecha</span>
+                    <span>Date</span>
                     <ArrowUpDown size={12} />
                   </div>
                 </th>
@@ -175,13 +175,13 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                 >
                   <div className="flex items-center gap-1">
                     <Bell size={14} className="text-muted-foreground" />
-                    <span className="hidden sm:inline">Método</span>
-                    <span className="sm:hidden">Mét.</span>
+                    <span className="hidden sm:inline">Method</span>
+                    <span className="sm:hidden">Meth.</span>
                     <ArrowUpDown size={12} />
                   </div>
                 </th>
                 <th scope="col" className="table-header-cell col-actions">
-                  <span className="sr-only">Acciones</span>
+                  <span className="sr-only">Actions</span>
                 </th>
               </tr>
             </thead>
@@ -222,7 +222,7 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                         </div>
                         <div className="md:hidden text-xs text-muted-foreground mt-1">
                           <span className="truncate">
-                            {type === 'domain' ? 'Notif. de dominio' : 'Notif. de hosting'}
+                            {type === 'domain' ? 'Domain notification' : 'Hosting notification'}
                           </span>
                         </div>
                       </div>
@@ -231,7 +231,7 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                       <button
                         onClick={() => handleDeleteClick(notification.id, notification.domain)}
                         className="text-red-500 hover:text-red-400 transition-colors p-1.5 rounded-md hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-                        title="Eliminar notificación"
+                        title="Delete notification"
                       >
                         <Trash2 size={14} />
                       </button>
@@ -244,8 +244,8 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
                   <td colSpan={5} className="table-cell text-center text-muted-foreground py-8">
                     <div className="flex flex-col items-center space-y-2">
                       <Bell className="w-8 h-8 text-muted-foreground/50" />
-                      <span>No hay notificaciones para {type === 'domain' ? 'dominios' : 'servicios de hosting'}</span>
-                      <span className="text-xs">Las notificaciones aparecerán aquí automáticamente</span>
+                      <span>No notifications for {type === 'domain' ? 'domains' : 'hosting services'}</span>
+                      <span className="text-xs">Notifications will appear here automatically</span>
                     </div>
                   </td>
                 </tr>
@@ -259,10 +259,10 @@ const NotificationTable: React.FC<NotificationTableProps> = ({ type }) => {
         isOpen={deleteDialog.isOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Confirmar eliminación"
-        message={`¿Estás seguro de que quieres eliminar la notificación para "${deleteDialog.notificationDomain}"? Esta acción no se puede deshacer.`}
-        confirmText="Eliminar"
-        cancelText="Cancelar"
+        title="Confirm deletion"
+        message={`Are you sure you want to delete the notification for "${deleteDialog.notificationDomain}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
         type="danger"
       />
     </>

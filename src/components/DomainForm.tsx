@@ -72,14 +72,14 @@ const DomainForm: React.FC = () => {
     <div className="form-section">
       <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <Plus className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold text-foreground">Nuevo Dominio</h3>
+        <h3 className="text-lg font-semibold text-foreground">New Domain</h3>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Nombre del dominio con verificación */}
         <div className="form-group">
           <label htmlFor="domain-name" className="form-label">
-            Nombre del dominio *
+            Domain Name *
           </label>
           <div className="relative">
             <input
@@ -89,7 +89,7 @@ const DomainForm: React.FC = () => {
               onChange={handleNameChange}
               onBlur={handleDomainCheck}
               className="form-input pr-10"
-              placeholder="ejemplo.com"
+              placeholder="example.com"
               required
             />
             {isChecking && (
@@ -109,7 +109,7 @@ const DomainForm: React.FC = () => {
           </div>
           {isAvailable === false && (
             <p className="text-sm text-red-500 mt-1">
-              Este dominio no está disponible
+              This domain is not available
             </p>
           )}
         </div>
@@ -132,7 +132,7 @@ const DomainForm: React.FC = () => {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="creation-date" className="form-label">
-              Fecha de creación *
+              Creation Date *
             </label>
             <input
               id="creation-date"
@@ -144,13 +144,13 @@ const DomainForm: React.FC = () => {
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Solo se permiten fechas hasta el día de hoy
+              Only dates up to today are allowed
             </p>
           </div>
           
           <div className="form-group">
             <label htmlFor="payment-period" className="form-label">
-              Período de pago *
+              Payment Period *
             </label>
             <select
               id="payment-period"
@@ -159,9 +159,9 @@ const DomainForm: React.FC = () => {
               className="form-input"
               required
             >
-              <option value="1 year">1 año</option>
-              <option value="2 years">2 años</option>
-              <option value="3 years">3 años</option>
+              <option value="1 year">1 year</option>
+              <option value="2 years">2 years</option>
+              <option value="3 years">3 years</option>
             </select>
           </div>
         </div>
@@ -169,7 +169,7 @@ const DomainForm: React.FC = () => {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="website" className="form-label">
-              Sitio web de registro *
+              Registration Website *
             </label>
             <input
               id="website"
@@ -177,17 +177,17 @@ const DomainForm: React.FC = () => {
               value={website}
               onChange={(e) => setWebsite(e.target.value)}
               className="form-input"
-              placeholder="https://ejemplo.com"
+              placeholder="https://example.com"
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              URL del proveedor donde registraste el dominio
+              URL of the provider where you registered the domain
             </p>
           </div>
           
           <div className="form-group">
             <label htmlFor="base-cost" className="form-label">
-              Costo base *
+              Base Cost *
             </label>
             <div className="relative">
               <input
@@ -204,7 +204,7 @@ const DomainForm: React.FC = () => {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Se calculará automáticamente una tarifa de mantenimiento del 20%
+              A 20% maintenance fee will be automatically calculated
             </p>
           </div>
         </div>
@@ -215,7 +215,7 @@ const DomainForm: React.FC = () => {
             className="btn-primary w-full sm:w-auto min-w-[120px]"
             disabled={!name || !creationDate || !website || !paymentPeriod || !baseCost || (checkAvailability && isAvailable === false)}
           >
-            Agregar Dominio
+            Add Domain
           </button>
         </div>
       </form>

@@ -72,7 +72,7 @@ export const sendWhatsAppNotification = async (notification: WhatsAppNotificatio
 
 // Email templates
 export const generateDomainExpirationEmail = (domainName: string, expirationDate: string, provider: string) => {
-  const subject = `⚠️ Dominio ${domainName} próximo a vencer`
+  const subject = `⚠️ Domain ${domainName} Expiring Soon`
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
   const favicon = `${baseUrl}/favicon.png`
   
@@ -94,17 +94,17 @@ export const generateDomainExpirationEmail = (domainName: string, expirationDate
       <div class="container">
         <div class="header">
           <h1><img style="width: 32px; height: 32px; vertical-align: middle; margin-right: 10px;" src="${favicon}" alt="" /> TrackingDude</h1>
-          <h2>Notificación de Vencimiento</h2>
+          <h2>Expiration Notification</h2>
         </div>
         
         <div class="alert">
-          <h3>⚠️ Tu dominio está próximo a vencer</h3>
-          <p><strong>Dominio:</strong> ${domainName}</p>
+          <h3>⚠️ Your domain is about to expire</h3>
+          <p><strong>Domain:</strong> ${domainName}</p>
           <p><strong>Proveedor:</strong> ${provider}</p>
           <p><strong>Fecha de vencimiento:</strong> ${expirationDate}</p>
         </div>
         
-        <p>Tu dominio <strong>${domainName}</strong> vencerá el <strong>${expirationDate}</strong>. Es importante que renueves tu dominio antes de la fecha de vencimiento para evitar interrupciones en tu servicio.</p>
+        <p>Your domain <strong>${domainName}</strong> will expire on <strong>${expirationDate}</strong>. It's important to renew your domain before the expiration date to avoid service interruptions.</p>
         
         <div class="footer">
           <p>Este mensaje fue enviado automáticamente por TrackingDude</p>
@@ -116,23 +116,23 @@ export const generateDomainExpirationEmail = (domainName: string, expirationDate
   `
   
   const text = `
-    TrackingDude - Notificación de Vencimiento
+    TrackingDude - Expiration Notification
     
-    Tu dominio ${domainName} está próximo a vencer.
+    Your domain ${domainName} is about to expire.
     
-    Detalles:
-    - Dominio: ${domainName}
-    - Proveedor: ${provider}
-    - Fecha de vencimiento: ${expirationDate}
+    Details:
+    - Domain: ${domainName}
+    - Provider: ${provider}
+    - Expiration Date: ${expirationDate}
     
-    Por favor, contacta a tu proveedor para renovar el dominio antes de la fecha de vencimiento.
+    Please contact your provider to renew the domain before the expiration date.
   `
   
   return { subject, html, text }
 }
 
 export const generateHostingExpirationEmail = (domain: string, expirationDate: string, provider: string) => {
-  const subject = `⚠️ Hosting ${domain} próximo a vencer`
+  const subject = `⚠️ Hosting ${domain} Expiration Notification`
   
   const html = `
     <!DOCTYPE html>
@@ -151,21 +151,21 @@ export const generateHostingExpirationEmail = (domain: string, expirationDate: s
       <div class="container">
         <div class="header">
           <h1>🖥️ TrackingDude</h1>
-          <h2>Notificación de Vencimiento de Hosting</h2>
+          <h2>Hosting Expiration Notification</h2>
         </div>
         
         <div class="alert">
-          <h3>⚠️ Tu servicio de hosting está próximo a vencer</h3>
-          <p><strong>Dominio:</strong> ${domain}</p>
-          <p><strong>Proveedor:</strong> ${provider}</p>
-          <p><strong>Fecha de vencimiento:</strong> ${expirationDate}</p>
+          <h3>⚠️ Your hosting service is about to expire</h3>
+          <p><strong>Domain:</strong> ${domain}</p>
+          <p><strong>Provider:</strong> ${provider}</p>
+          <p><strong>Expiration Date:</strong> ${expirationDate}</p>
         </div>
         
-        <p>Tu servicio de hosting para <strong>${domain}</strong> vencerá el <strong>${expirationDate}</strong>. Es importante que renueves tu hosting antes de la fecha de vencimiento para evitar que tu sitio web se desconecte.</p>
+        <p>Your hosting service for <strong>${domain}</strong> will expire on <strong>${expirationDate}</strong>. It's important to renew your hosting before the expiration date to prevent your website from going offline.</p>
         
         <div class="footer">
-          <p>Este mensaje fue enviado automáticamente por TrackingDude</p>
-          <p>Sistema de gestión de dominios y hosting</p>
+          <p>This message was sent automatically by TrackingDude</p>
+          <p>Domain and hosting management system</p>
         </div>
       </div>
     </body>
@@ -173,16 +173,16 @@ export const generateHostingExpirationEmail = (domain: string, expirationDate: s
   `
   
   const text = `
-    TrackingDude - Notificación de Vencimiento de Hosting
+    TrackingDude - Hosting Expiration Notification
     
-    Tu hosting ${domain} está próximo a vencer.
+    Your hosting ${domain} is about to expire.
     
-    Detalles:
-    - Dominio: ${domain}
-    - Proveedor: ${provider}
-    - Fecha de vencimiento: ${expirationDate}
+    Details:
+    - Domain: ${domain}
+    - Provider: ${provider}
+    - Expiration Date: ${expirationDate}
     
-    Por favor, contacta a tu proveedor para renovar el hosting antes de la fecha de vencimiento.
+    Please contact your provider to renew the hosting before the expiration date.
   `
   
   return { subject, html, text }
@@ -191,31 +191,31 @@ export const generateHostingExpirationEmail = (domain: string, expirationDate: s
 // WhatsApp message templates
 export const generateWhatsAppMessage = (type: 'domain' | 'hosting', name: string, expirationDate: string, provider: string) => {
   const emoji = type === 'domain' ? '🌐' : '🖥️'
-  const service = type === 'domain' ? 'dominio' : 'hosting'
+  const service = type === 'domain' ? 'domain' : 'hosting'
   
-  return `${emoji} *TrackingDude - Alerta de Vencimiento*
+  return `${emoji} *TrackingDude - Expiration Alert*
 
-⚠️ Tu ${service} *${name}* está próximo a vencer.
+⚠️ Your ${service} *${name}* is about to expire.
 
-📅 *Fecha de vencimiento:* ${expirationDate}
-🏢 *Proveedor:* ${provider}
+📅 *Expiration Date:* ${expirationDate}
+🏢 *Provider:* ${provider}
 
-Por favor, renueva tu ${service} antes de la fecha de vencimiento para evitar interrupciones en el servicio.
+Please renew your ${service} before the expiration date to avoid service interruptions.
 
-_Mensaje automático de TrackingDude_`
+_Automated message from TrackingDude_`
 }
 
 // Test notification functions
 export const sendTestEmail = async (to: string) => {
   const emailData = generateDomainExpirationEmail(
-    'ejemplo.com',
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES'),
-    'Proveedor de Ejemplo'
+    'example.com',
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
+    'Example Provider'
   )
   
   return await sendEmailNotification({
     to,
-    subject: '[PRUEBA] ' + emailData.subject,
+    subject: '[TEST] ' + emailData.subject,
     html: emailData.html,
     text: emailData.text,
   })
@@ -224,13 +224,13 @@ export const sendTestEmail = async (to: string) => {
 export const sendTestWhatsApp = async (to: string) => {
   const message = generateWhatsAppMessage(
     'domain',
-    'ejemplo.com',
-    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES'),
-    'Proveedor de Ejemplo'
+    'example.com',
+    new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US'),
+    'Example Provider'
   )
   
   return await sendWhatsAppNotification({
     to,
-    body: '[PRUEBA] ' + message,
+    body: '[TEST] ' + message,
   })
 } 

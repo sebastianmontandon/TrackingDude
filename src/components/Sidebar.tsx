@@ -65,13 +65,13 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose, onS
          </div>
          <div>
            <h1 className="text-sm font-semibold text-foreground">TrackingDude</h1>
-           <p className="text-xs text-muted-foreground">Gestión de Dominios</p>
+           <p className="text-xs text-muted-foreground">Domain Management</p>
          </div>
        </div>
      </div>
           <div className="mb-4 px-3">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mt-9">
-              Menú Principal
+              Main Menu
             </p>
           </div>
           <ul className="space-y-1">
@@ -83,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose, onS
             />
             <NavItem 
               icon={<Globe size={18} />} 
-              label="Dominios" 
+              label="Domains" 
               active={currentPage === 'domains'}
               onClick={() => onNavigate('domains')}
             />

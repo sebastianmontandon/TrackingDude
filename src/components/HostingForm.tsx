@@ -64,7 +64,7 @@ const HostingForm: React.FC = () => {
     <div className="form-section">
       <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <Server className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold">Nuevo Hosting</h3>
+        <h3 className="text-lg font-semibold">New Hosting</h3>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -78,14 +78,14 @@ const HostingForm: React.FC = () => {
             className="mt-1 h-4 w-4 rounded border-input text-primary focus:ring-primary"
           />
           <label htmlFor="includes-hosting" className="text-sm text-muted-foreground leading-relaxed">
-            El servicio incluye hosting web (no solo dominio)
+            The service includes web hosting (not just domain)
           </label>
         </div>
 
         {/* Campo de dominio libre - condicionalmente habilitado */}
         <div className="form-group">
           <label htmlFor="domain" className="form-label">
-            Dominio {includesHosting && '*'}
+            Domain {includesHosting && '*'}
           </label>
           <input
             id="domain"
@@ -93,14 +93,14 @@ const HostingForm: React.FC = () => {
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
             className={`form-input ${!includesHosting ? 'opacity-50 cursor-not-allowed' : ''}`}
-            placeholder={includesHosting ? "ejemplo.com" : "No se requiere dominio"}
+            placeholder={includesHosting ? "example.com" : "No domain required"}
             disabled={!includesHosting}
             required={includesHosting}
           />
           <p className="text-xs text-muted-foreground mt-1">
             {includesHosting 
-              ? "Ingresa el nombre del dominio para el cual configurarás el hosting"
-              : "Campo deshabilitado porque el servicio no incluye hosting web"
+              ? "Enter the domain name for which you'll configure hosting"
+              : "Field disabled because the service doesn't include web hosting"
             }
           </p>
         </div>
@@ -109,7 +109,7 @@ const HostingForm: React.FC = () => {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="provider" className="form-label">
-              Proveedor *
+              Provider *
             </label>
             <input
               id="provider"
@@ -117,14 +117,14 @@ const HostingForm: React.FC = () => {
               value={provider}
               onChange={(e) => setProvider(e.target.value)}
               className="form-input"
-              placeholder="ej. HostGator, SiteGround"
+              placeholder="e.g., HostGator, SiteGround"
               required
             />
           </div>
           
           <div className="form-group">
             <label htmlFor="payment-type" className="form-label">
-              Tipo de pago *
+              Payment Type *
             </label>
             <select
               id="payment-type"
@@ -133,9 +133,9 @@ const HostingForm: React.FC = () => {
               className="form-input"
               required
             >
-              <option value="Monthly">Mensual</option>
-              <option value="Annual">Anual</option>
-              <option value="Biennial">Bienal</option>
+              <option value="Monthly">Monthly</option>
+              <option value="Annual">Annual</option>
+              <option value="Biennial">Biennial</option>
             </select>
           </div>
         </div>
@@ -144,7 +144,7 @@ const HostingForm: React.FC = () => {
         <div className="form-grid">
           <div className="form-group">
             <label htmlFor="registration-date" className="form-label">
-              Fecha de alta *
+              Registration Date *
             </label>
             <input
               id="registration-date"
@@ -156,13 +156,13 @@ const HostingForm: React.FC = () => {
               required
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Solo se permiten fechas hasta el día de hoy
+              Only dates up to today are allowed
             </p>
           </div>
           
           <div className="form-group">
             <label htmlFor="base-cost" className="form-label">
-              Costo base *
+              Base Cost *
             </label>
             <div className="relative">
               <input
@@ -179,7 +179,7 @@ const HostingForm: React.FC = () => {
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              Se calculará automáticamente una tarifa de mantenimiento del 20%
+              A 15% maintenance fee will be automatically calculated
             </p>
           </div>
         </div>
@@ -190,7 +190,7 @@ const HostingForm: React.FC = () => {
             className="btn-primary w-full sm:w-auto min-w-[120px]"
             disabled={!provider || !paymentType || !registrationDate || !baseCost || (includesHosting && !domain)}
           >
-            Agregar Hosting
+            Add Hosting
           </button>
         </div>
       </form>

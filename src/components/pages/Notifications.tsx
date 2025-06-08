@@ -104,7 +104,7 @@ const NotificationConfigForm: React.FC = () => {
         setNotificationMethod('EMAIL')
         setCalculatedExpirationDate('')
       } catch (error) {
-        console.error('Error al agregar notificación:', error);
+        console.error('Error adding notification:', error);
       }
     }
   }
@@ -121,14 +121,14 @@ const NotificationConfigForm: React.FC = () => {
     <div className="form-section">
       <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <Plus className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold text-foreground">Configurar Notificación</h3>
+        <h3 className="text-lg font-semibold text-foreground">Configure Notification</h3>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Tipo de servicio */}
         <div className="form-group">
           <label htmlFor="notification-type" className="form-label">
-            Tipo de servicio *
+            Service Type *
           </label>
           <select
             id="notification-type"
@@ -137,7 +137,7 @@ const NotificationConfigForm: React.FC = () => {
             className="form-input"
             required
           >
-            <option value="domain">Dominio</option>
+            <option value="domain">Domain</option>
             <option value="hosting">Hosting</option>
           </select>
         </div>
@@ -145,7 +145,7 @@ const NotificationConfigForm: React.FC = () => {
         {/* Selector de servicio */}
         <div className="form-group">
           <label htmlFor="service-select" className="form-label">
-            {type === 'domain' ? 'Dominio' : 'Servicio de Hosting'} *
+            {type === 'domain' ? 'Domain' : 'Hosting Service'} *
           </label>
           <select
             id="service-select"
@@ -154,7 +154,7 @@ const NotificationConfigForm: React.FC = () => {
             className="form-input"
             required
           >
-            <option value="">Selecciona {type === 'domain' ? 'un dominio' : 'un servicio'}</option>
+            <option value="">Select {type === 'domain' ? 'a domain' : 'a service'}</option>
             {getAvailableServices().map(service => (
               <option key={service.id} value={service.id}>{service.name}</option>
             ))}
@@ -164,17 +164,17 @@ const NotificationConfigForm: React.FC = () => {
               <div className="flex items-center gap-2 text-sm">
                 <Calendar size={14} className="text-blue-400" />
                 <span className="text-blue-300">
-                  <strong>Fecha de vencimiento:</strong> {calculatedExpirationDate}
+                  <strong>Expiration Date:</strong> {calculatedExpirationDate}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm mt-1">
                 <Bell size={14} className="text-green-400" />
                 <span className="text-green-300">
-                  <strong>Notificación programada para:</strong> {notificationDate}
+                  <strong>Notification scheduled for:</strong> {notificationDate}
                 </span>
               </div>
               <p className="text-xs text-blue-400 mt-1">
-                La notificación se enviará automáticamente 1 día antes del vencimiento
+                The notification will be sent automatically 1 day before expiration
               </p>
             </div>
           )}
@@ -183,7 +183,7 @@ const NotificationConfigForm: React.FC = () => {
         {/* Método de notificación - solo Email y WhatsApp */}
         <fieldset className="form-group">
           <legend className="form-label">
-            Método de notificación *
+            Notification Method *
           </legend>
           <div className="grid grid-cols-2 gap-3 mt-2">
             {[
@@ -219,7 +219,7 @@ const NotificationConfigForm: React.FC = () => {
             className="btn-primary w-full sm:w-auto min-w-[140px]"
             disabled={!selectedService || !notificationDate || !notificationMethod}
           >
-            Programar Notificación
+            Schedule Notification
           </button>
         </div>
       </form>
@@ -332,7 +332,7 @@ const NotificationTester: React.FC = () => {
     <div className="form-section">
       <div className="flex items-center gap-2 mb-4 sm:mb-6">
         <TestTube className="h-5 w-5 text-primary" />
-        <h3 className="text-lg font-semibold text-foreground">Probar Notificaciones</h3>
+        <h3 className="text-lg font-semibold text-foreground">Test Notifications</h3>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -340,12 +340,12 @@ const NotificationTester: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <Mail className="h-5 w-5 text-primary" />
-            <h4 className="font-medium text-foreground">Prueba de Email</h4>
+            <h4 className="font-medium text-foreground">Email Test</h4>
           </div>
           
           <div className="form-group">
             <label htmlFor="test-email" className="form-label">
-              Email de destino
+              Destination Email
             </label>
             <input
               id="test-email"
@@ -353,7 +353,7 @@ const NotificationTester: React.FC = () => {
               value={testEmail}
               onChange={(e) => setTestEmail(e.target.value)}
               className="form-input"
-              placeholder="tu@email.com"
+              placeholder="your@email.com"
             />
           </div>
           
@@ -365,19 +365,19 @@ const NotificationTester: React.FC = () => {
             {isTestingEmail ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-                Enviando...
+                Sending...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4" />
-                Enviar Email de Prueba
+                Send Test Email
               </>
             )}
           </button>
           
           {emailResult && (
             <div className={`p-3 rounded-lg text-sm border ${
-              emailResult.startsWith('✅') 
+              emailResult.startsWith('Email sent successfully') 
                 ? 'bg-green-500/10 text-green-600 border-green-500/20' 
                 : 'bg-destructive/10 text-destructive border-destructive/20'
             }`}>
@@ -390,12 +390,12 @@ const NotificationTester: React.FC = () => {
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
             <MessageSquare className="h-5 w-5 text-primary" />
-            <h4 className="font-medium text-foreground">Prueba de WhatsApp</h4>
+            <h4 className="font-medium text-foreground">WhatsApp Test</h4>
           </div>
           
           <div className="form-group">
             <label htmlFor="test-phone" className="form-label">
-              Número de teléfono
+              Phone Number
             </label>
             <input
               id="test-phone"
@@ -415,19 +415,19 @@ const NotificationTester: React.FC = () => {
             {isTestingWhatsApp ? (
               <>
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
-                Enviando...
+                Sending...
               </>
             ) : (
               <>
                 <Send className="h-4 w-4" />
-                Enviar WhatsApp de Prueba
+                Send Test Message
               </>
             )}
           </button>
           
           {whatsappResult && (
             <div className={`p-3 rounded-lg text-sm border ${
-              whatsappResult.startsWith('✅') 
+              whatsappResult.startsWith('WhatsApp sent successfully') 
                 ? 'bg-green-500/10 text-green-600 border-green-500/20' 
                 : 'bg-destructive/10 text-destructive border-destructive/20'
             }`}>
@@ -438,10 +438,10 @@ const NotificationTester: React.FC = () => {
       </div>
       
       <div className="mt-6 p-4 bg-muted/20 rounded-lg border border-border">
-        <h4 className="font-medium text-foreground mb-2">Configuración Requerida</h4>
+        <h4 className="font-medium text-foreground mb-2">Required Configuration</h4>
         <div className="text-sm text-muted-foreground space-y-1">
-          <p><strong>Email:</strong> Variables de entorno EMAIL_USER y EMAIL_PASSWORD</p>
-          <p><strong>WhatsApp:</strong> Variables de entorno TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN y TWILIO_WHATSAPP_FROM</p>
+          <p><strong>Email:</strong> EMAIL_USER and EMAIL_PASSWORD environment variables</p>
+          <p><strong>WhatsApp:</strong> TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_WHATSAPP_FROM environment variables</p>
         </div>
       </div>
     </div>
@@ -453,19 +453,19 @@ export default function Notifications() {
     <div className="page-container">
       {/* Header */}
       <div className="section-header">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Centro de Notificaciones</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Notification Management</h1>
         <p className="section-description">
-          Revisa todas las notificaciones y alertas del sistema. Mantente informado sobre el estado de tus servicios.
+          Configure and manage expiration notifications for your domains and hosting services
         </p>
       </div>
       
       {/* Notification Configuration Section */}
       <div className="content-section">
         <div className="section-header">
-          <h2 className="section-title">Configurar Nueva Notificación</h2>
+          <h2 className="section-title">Configure New Notification</h2>
           <p className="section-description">
-            Programa notificaciones personalizadas para tus dominios y servicios de hosting. 
-            La fecha se calcula automáticamente como fecha de vencimiento - 1 día.
+            Schedule custom notifications for your domains and hosting services. 
+            The date is calculated automatically as expiration date - 1 day.
           </p>
         </div>
         <NotificationConfigForm />
@@ -474,9 +474,9 @@ export default function Notifications() {
       {/* Domain Notifications Section */}
       <div className="content-section">
         <div className="section-header">
-          <h2 className="section-title">Notificaciones de Dominios</h2>
+          <h2 className="section-title">Your Scheduled Notifications</h2>
           <p className="section-description">
-            Alertas y notificaciones relacionadas con tus dominios
+            Review and manage all your scheduled notifications
           </p>
         </div>
         <NotificationTable type="domain" />

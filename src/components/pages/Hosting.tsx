@@ -9,18 +9,18 @@ export default function Hosting() {
     <div className="page-container">
       {/* Header */}
       <div className="section-header">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Gestión de Hosting</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Hosting Management</h1>
         <p className="section-description">
-          Administra tus servicios de hosting y servidores. Controla costos y mantén un seguimiento de todos tus servicios.
+          Manage your hosting services and servers. Control costs and keep track of all your services.
         </p>
       </div>
       
       {/* Hosting Form Section */}
       <div className="content-section">
         <div className="section-header">
-          <h2 className="section-title">Agregar Nuevo Hosting</h2>
+          <h2 className="section-title">Add New Hosting</h2>
           <p className="section-description">
-            Registra un nuevo servicio de hosting en tu sistema
+            Register a new hosting service in your system
           </p>
         </div>
         <HostingForm />
@@ -29,9 +29,9 @@ export default function Hosting() {
       {/* Hosting Table Section */}
       <div className="content-section">
         <div className="section-header">
-          <h2 className="section-title">Servicios de Hosting</h2>
+          <h2 className="section-title">Hosting Services</h2>
           <p className="section-description">
-            Todos tus servicios de hosting con información de costos y configuración
+            All your hosting services with cost and configuration information
           </p>
         </div>
         <HostingTable />

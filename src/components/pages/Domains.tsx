@@ -9,18 +9,18 @@ export default function Domains() {
     <div className="page-container">
       {/* Header */}
       <div className="section-header">
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Gestión de Dominios</h1>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Domain Management</h1>
         <p className="section-description">
-          Administra tus dominios, renueva a tiempo y mantén un registro de todos tus servicios de dominio.
+          Manage your domains, renew on time, and keep track of all your domain services.
         </p>
       </div>
       
       {/* Domain Form Section */}
       <div className="content-section">
         <div className="section-header">
-          <h2 className="section-title">Agregar Nuevo Dominio</h2>
+          <h2 className="section-title">Add New Domain</h2>
           <p className="section-description">
-            Registra un nuevo dominio en tu sistema
+            Register a new domain in your system
           </p>
         </div>
         <DomainForm />
@@ -29,9 +29,9 @@ export default function Domains() {
       {/* Domain Table Section */}
       <div className="content-section">
         <div className="section-header">
-          <h2 className="section-title">Tus Dominios</h2>
+          <h2 className="section-title">Your Domains</h2>
           <p className="section-description">
-            Todos tus dominios con información de vencimiento y costos
+            All your domains with expiration and cost information
           </p>
         </div>
         <DomainTable />

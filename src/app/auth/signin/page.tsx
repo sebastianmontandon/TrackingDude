@@ -26,7 +26,7 @@ export default function SignIn() {
         email: formData.email,
         password: formData.password,
         redirect: false,
-        callbackUrl: '/dashboard'
+        callbackUrl: '/'
       })
 
       if (result?.error) {
@@ -92,14 +92,14 @@ export default function SignIn() {
         <div className="bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-gray-700/30">
           <div className="px-8 py-10 sm:p-10">
             <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-600/80 mb-4 shadow-lg">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 mb-4 shadow-lg">
                 <img src="/favicon.png" alt="Logo" className="w-18 h-18" />
               </div>
-              <h1 className="text-3xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+              <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400">
                 TrackingDude
               </h1>
               <p className="mt-2 text-sm text-gray-300">
-                Gestiona tus dominios y hosting en un solo lugar
+                Manage your domains and hosting in one place
               </p>
             </div>
 
@@ -119,7 +119,7 @@ export default function SignIn() {
                     onChange={handleChange}
                     disabled={isLoading}
                     className="block w-full pl-10 pr-3 py-3 border border-gray-600/50 rounded-xl bg-gray-700/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 text-white disabled:opacity-70 disabled:cursor-not-allowed"
-                    placeholder="Correo electrónico"
+                    placeholder="Email address"
                   />
                 </div>
 
@@ -137,7 +137,7 @@ export default function SignIn() {
                     onChange={handleChange}
                     disabled={isLoading}
                     className="block w-full pl-10 pr-12 py-3 border border-gray-600/50 rounded-xl bg-gray-700/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 text-white disabled:opacity-70 disabled:cursor-not-allowed"
-                    placeholder="Contraseña"
+                    placeholder="Password"
                   />
                   <button
                     type="button"
@@ -177,12 +177,12 @@ export default function SignIn() {
                 {isLoading ? (
                   <>
                     <RefreshCw className="animate-spin h-5 w-5 mr-2" />
-                    Iniciando sesión...
+                    Signing in...
                   </>
                 ) : (
                   <>
                     <LogIn className="absolute left-4 h-5 w-5 text-indigo-200 group-hover:text-white transition-colors" />
-                    Iniciar sesión
+                    Sign In
                   </>
                 )}
               </button>
@@ -198,22 +198,22 @@ export default function SignIn() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
             </div>
-            <h3 className="text-base font-medium text-white">Credenciales de prueba</h3>
+            <h3 className="text-base font-medium text-white">Test Credentials</h3>
           </div>
           <div className="space-y-3 text-sm">
             <div className="flex items-start">
               <span className="w-24 text-base text-gray-300 mt-1">Email:</span>
               <div className="flex-1">
                 <div className="font-mono bg-gray-700/50 px-3 py-2 rounded-lg text-sm text-white w-full">
-                  admin@example.com
+                reader@example.com
                 </div>
               </div>
             </div>
             <div className="flex items-start">
-              <span className="w-24 text-base text-gray-300 mt-1">Contraseña:</span>
+              <span className="w-24 text-base text-gray-300 mt-1">Password:</span>
               <div className="flex-1">
                 <div className="font-mono bg-gray-700/50 px-3 py-2 rounded-lg text-sm text-white w-full">
-                  password123
+                reader123
                 </div>
               </div>
             </div>

@@ -51,7 +51,7 @@ export default function SignIn() {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full space-y-4">
         <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
           <div className="text-center">
             <div className="mx-auto h-18 w-18 rounded-full bg-primary/10 flex items-center justify-center mb-4">

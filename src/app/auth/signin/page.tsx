@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn, getSession } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, LogIn, RefreshCw, AlertCircle } from 'lucide-react'
 
 export default function SignIn() {
   const [formData, setFormData] = useState({
@@ -15,6 +15,7 @@ export default function SignIn() {
   const [error, setError] = useState('')
   const router = useRouter()
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -25,14 +26,13 @@ export default function SignIn() {
         email: formData.email,
         password: formData.password,
         redirect: false,
-        callbackUrl: '/' // Redirigir a la página principal después del login
+        callbackUrl: '/dashboard'
       })
 
       if (result?.error) {
         setError('Credenciales inválidas')
       } else {
-        // Redirigir a la página principal
-        window.location.href = result?.url || '/'; // Usar window.location para forzar una recarga completa
+        window.location.href = result?.url || '/';
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -49,111 +49,196 @@ export default function SignIn() {
     }))
   }
 
+  // Animated background effect
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isLoadingComplete, setIsLoadingComplete] = useState(false);
+
+  useEffect(() => {
+    // Simulate loading completion
+    const timer = setTimeout(() => setIsLoadingComplete(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - left) / width) * 100;
+    const y = ((e.clientY - top) / height) * 100;
+    setMousePosition({ x, y });
+  };
+
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="max-w-md w-full space-y-4">
-        <div className="bg-card rounded-2xl shadow-xl border border-border p-8">
-          <div className="text-center">
-            <div className="mx-auto h-18 w-18 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-              <img src="/favicon.png" alt="Logo" />
-            </div>
-            <h2 className="text-3xl font-bold text-foreground">Iniciar Sesión</h2>
-            <p className="mt-2 text-muted-foreground">
-              Accede a tu panel de TrackingDude
-            </p>
-          </div>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 overflow-hidden relative bg-gray-900"
+      style={{
+        background: 'linear-gradient(135deg, #111827 0%, #1f2937 100%)',
+      }}
+      onMouseMove={handleMouseMove}
+    >
+      {/* Animated background elements */}
+      <div 
+        className="absolute inset-0 opacity-30"
+        style={{
+          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(99, 102, 241, 0.15), transparent 20%)`,
+          transition: 'background 0.3s ease-out',
+        }}
+      />
+      
+      {/* Decorative shapes */}
+      <div className="absolute top-1/4 -left-20 w-64 h-64 bg-indigo-900/30 rounded-full mix-blend-overlay filter blur-xl opacity-50 animate-blob" />
+      <div className="absolute top-1/2 -right-10 w-64 h-64 bg-purple-900/30 rounded-full mix-blend-overlay filter blur-xl opacity-50 animate-blob animation-delay-2000" />
+      <div className="absolute bottom-1/4 left-1/2 w-64 h-64 bg-pink-900/30 rounded-full mix-blend-overlay filter blur-xl opacity-50 animate-blob animation-delay-4000" />
 
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                <p className="text-destructive text-sm">{error}</p>
+      <div className={`w-full max-w-md relative z-10 transition-all duration-700 ease-out transform ${isLoadingComplete ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+        <div className="bg-gray-800/80 backdrop-blur-lg rounded-2xl shadow-2xl overflow-hidden border border-gray-700/30">
+          <div className="px-8 py-10 sm:p-10">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-600/80 mb-4 shadow-lg">
+                <img src="/favicon.png" alt="Logo" className="w-18 h-18" />
               </div>
-            )}
+              <h1 className="text-3xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+                TrackingDude
+              </h1>
+              <p className="mt-2 text-sm text-gray-300">
+                Gestiona tus dominios y hosting en un solo lugar
+              </p>
+            </div>
 
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                  Email
-                </label>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="space-y-4">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-gray-400" />
+                  </div>
                   <input
                     id="email"
                     name="email"
                     type="email"
+                    autoComplete="email"
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="pl-10 w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground placeholder:text-muted-foreground"
-                    placeholder="tu@email.com"
+                    disabled={isLoading}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-600/50 rounded-xl bg-gray-700/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                    placeholder="Correo electrónico"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-                  Contraseña
-                </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Lock className="h-5 w-5 text-gray-400" />
+                  </div>
                   <input
                     id="password"
                     name="password"
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="pl-10 pr-10 w-full px-4 py-3 border border-input rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground placeholder:text-muted-foreground"
-                    placeholder="Tu contraseña"
+                    disabled={isLoading}
+                    className="block w-full pl-10 pr-12 py-3 border border-gray-600/50 rounded-xl bg-gray-700/50 focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 text-white disabled:opacity-70 disabled:cursor-not-allowed"
+                    placeholder="Contraseña"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 h-5 w-5 text-muted-foreground hover:text-foreground"
+                    disabled={isLoading}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {showPassword ? <EyeOff /> : <Eye />}
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" />
+                    ) : (
+                      <Eye className="h-5 w-5" />
+                    )}
                   </button>
                 </div>
               </div>
-            </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-primary hover:bg-primary/90 disabled:bg-primary/50 text-primary-foreground font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center gap-2"
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-foreground"></div>
-                  Iniciando sesión...
-                </>
-              ) : (
-                <>
-                  <LogIn className="h-5 w-5" />
-                  Iniciar Sesión
-                </>
+              {error && (
+                <div className="rounded-xl bg-red-900/30 p-4 border border-red-800/30 backdrop-blur-sm">
+                  <div className="flex">
+                    <div className="flex-shrink-0">
+                      <AlertCircle className="h-5 w-5 text-red-400" />
+                    </div>
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-red-200">{error}</p>
+                    </div>
+                  </div>
+                </div>
               )}
-            </button>
 
-            <div className="text-center">
-              <p className="text-muted-foreground text-sm">
-                TrackingDude - Sistema de Gestión de Dominios
-              </p>
-            </div>
-          </form>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className={`group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-xl text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 shadow-lg shadow-indigo-500/10 hover:shadow-xl hover:shadow-indigo-500/20 transition-all duration-200 transform hover:-translate-y-0.5 ${
+                  isLoading ? 'opacity-80 cursor-not-allowed' : ''
+                }`}
+              >
+                {isLoading ? (
+                  <>
+                    <RefreshCw className="animate-spin h-5 w-5 mr-2" />
+                    Iniciando sesión...
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="absolute left-4 h-5 w-5 text-indigo-200 group-hover:text-white transition-colors" />
+                    Iniciar sesión
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
         </div>
-        
-        {/* Demo credentials info */}
-        <div className="bg-card/50 border border-border rounded-lg p-4">
-          <div className="text-center">
-            <h3 className="text-sm font-medium text-foreground mb-2">Credenciales de Prueba</h3>
-            <div className="space-y-1 text-sm text-muted-foreground">
-              <p><strong>Email:</strong> lector@ejemplo.com</p>
-              <p><strong>Contraseña:</strong> lector123</p>
+
+        {/* Demo credentials card */}
+        <div className="mt-8 bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-gray-700/30">
+          <div className="flex items-center mb-4">
+            <div className="p-2 rounded-full bg-indigo-900/30 text-indigo-400 mr-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 className="text-base font-medium text-white">Credenciales de prueba</h3>
+          </div>
+          <div className="space-y-3 text-sm">
+            <div className="flex items-start">
+              <span className="w-24 text-base text-gray-300 mt-1">Email:</span>
+              <div className="flex-1">
+                <div className="font-mono bg-gray-700/50 px-3 py-2 rounded-lg text-sm text-white w-full">
+                  admin@example.com
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <span className="w-24 text-base text-gray-300 mt-1">Contraseña:</span>
+              <div className="flex-1">
+                <div className="font-mono bg-gray-700/50 px-3 py-2 rounded-lg text-sm text-white w-full">
+                  password123
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Global styles for animations */}
+      <style jsx global>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+      `}</style>
     </div>
   )
-} 
+}

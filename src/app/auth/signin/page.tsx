@@ -205,7 +205,7 @@ export default function SignIn() {
               <span className="w-24 text-base text-gray-300 mt-1">Email:</span>
               <div className="flex-1">
                 <div className="font-mono bg-gray-700/50 px-3 py-2 rounded-lg text-sm text-white w-full">
-                reader@example.com
+                lector@ejemplo.com
                 </div>
               </div>
             </div>
@@ -213,7 +213,7 @@ export default function SignIn() {
               <span className="w-24 text-base text-gray-300 mt-1">Password:</span>
               <div className="flex-1">
                 <div className="font-mono bg-gray-700/50 px-3 py-2 rounded-lg text-sm text-white w-full">
-                reader123
+                lector123
                 </div>
               </div>
             </div>

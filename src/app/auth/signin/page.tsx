@@ -144,12 +144,12 @@ export default function SignIn() {
         </div>
         
         {/* Demo credentials info */}
-        <div className="bg-card/50 border border-border rounded-lg p-4">
+        <div className="bg-card/50 border border-border rounded-lg p-4 mb-4">
           <div className="text-center">
             <h3 className="text-sm font-medium text-foreground mb-2">Credenciales de Prueba</h3>
             <div className="space-y-1 text-sm text-muted-foreground">
-              <p><strong>Email:</strong> admin@trackingdude.com</p>
-              <p><strong>Contraseña:</strong> 123456</p>
+              <p><strong>Email:</strong> lector@ejemplo.com</p>
+              <p><strong>Contraseña:</strong> lector123</p>
             </div>
           </div>
         </div>

@@ -144,7 +144,7 @@ export default function SignIn() {
         </div>
         
         {/* Demo credentials info */}
-        <div className="bg-card/50 border border-border rounded-lg p-4 mb-4">
+        <div className="bg-card/50 border border-border rounded-lg p-4">
           <div className="text-center">
             <h3 className="text-sm font-medium text-foreground mb-2">Credenciales de Prueba</h3>
             <div className="space-y-1 text-sm text-muted-foreground">

@@ -2,6 +2,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { addDays, format } from 'date-fns';
+import { useData } from './DataProvider';
 
 export interface Domain {
   id: string;
@@ -17,7 +18,7 @@ export interface Domain {
 
 interface DomainContextType {
   domains: Domain[];
-  addDomain: (domain: Omit<Domain, 'id' | 'expirationDate'>) => Promise<void>;
+  addDomain: (domain: Omit<Domain, 'id' | 'expirationDate'>) => Promise<Domain>;
   removeDomain: (id: string) => Promise<void>;
   checkDomainAvailability: (name: string) => Promise<boolean>;
   loading: boolean;
@@ -27,18 +28,19 @@ interface DomainContextType {
 const DomainContext = createContext<DomainContextType | undefined>(undefined);
 
 export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [domains, setDomains] = useState<Domain[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { domains: initialDomains, loading, isReadOnly } = useData();
+  const [domains, setDomains] = useState<Domain[]>(initialDomains || []);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar dominios al inicializar
+  // Sincronizar dominios cuando cambien en DataProvider
   useEffect(() => {
-    fetchDomains();
-  }, []);
+    setDomains(initialDomains || []);
+  }, [initialDomains]);
 
   const fetchDomains = async () => {
+    if (isReadOnly) return; // No hacer fetch si es de solo lectura
+    
     try {
-      setLoading(true);
       const response = await fetch('/api/domains');
       if (!response.ok) {
         throw new Error('Error al cargar dominios');
@@ -46,17 +48,27 @@ export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       const data = await response.json();
       setDomains(data);
       setError(null);
+      return data;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error fetching domains:', err);
-    } finally {
-      setLoading(false);
+      throw err;
     }
   };
 
   const addDomain = async (domainData: Omit<Domain, 'id' | 'expirationDate'>) => {
+    if (isReadOnly) {
+      // Si es de solo lectura, solo actualizar localmente para la sesión actual
+      const newDomain = {
+        ...domainData,
+        id: `mock-${Date.now()}`,
+        expirationDate: new Date().toISOString(),
+      };
+      setDomains(prev => [...prev, newDomain as Domain]);
+      return newDomain;
+    }
+
     try {
-      setLoading(true);
       const response = await fetch('/api/domains', {
         method: 'POST',
         headers: {
@@ -70,20 +82,24 @@ export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) 
       }
 
       const newDomain = await response.json();
-      setDomains(prevDomains => [...prevDomains, newDomain]);
+      setDomains(prev => [...prev, newDomain]);
       setError(null);
+      return newDomain;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error adding domain:', err);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   const removeDomain = async (id: string) => {
+    if (isReadOnly) {
+      // Si es de solo lectura, solo actualizar localmente
+      setDomains(prev => prev.filter(domain => domain.id !== id));
+      return;
+    }
+
     try {
-      setLoading(true);
       const response = await fetch(`/api/domains/${id}`, {
         method: 'DELETE',
       });
@@ -92,31 +108,34 @@ export const DomainProvider: React.FC<{ children: ReactNode }> = ({ children }) 
         throw new Error('Error al eliminar dominio');
       }
 
-      setDomains(prevDomains => prevDomains.filter(domain => domain.id !== id));
+      setDomains(prev => prev.filter(domain => domain.id !== id));
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error removing domain:', err);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   // Mock function to simulate API check for domain availability
   const checkDomainAvailability = async (name: string): Promise<boolean> => {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Simple simulation: Domains that exist in our list are unavailable
-    const isDomainTaken = domains.some(domain => domain.name.toLowerCase() === name.toLowerCase());
-    
-    // Random availability for demo purposes - domains not in our list have a 70% chance of being available
-    if (!isDomainTaken) {
-      return Math.random() > 0.3;
+    // Para usuarios de solo lectura, verificar solo en los datos locales
+    if (isReadOnly) {
+      return !domains.some(domain => domain.name === name);
     }
     
-    return !isDomainTaken;
+    // Para administradores, verificar en el servidor
+    try {
+      const response = await fetch(`/api/domains/check?name=${encodeURIComponent(name)}`);
+      if (!response.ok) {
+        throw new Error('Error al verificar disponibilidad');
+      }
+      const { available } = await response.json();
+      return available;
+    } catch (err) {
+      console.error('Error checking domain availability:', err);
+      return false;
+    }
   };
 
   return (

@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           phone: user.phone,
+          role: user.role as 'ADMIN' | 'READ_ONLY'
         }
       }
     })
@@ -74,6 +75,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id;
         token.phone = user.phone || undefined;
+        token.role = (user as any).role || 'READ_ONLY';
       }
       return token;
     },
@@ -81,6 +83,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.phone = token.phone as string | undefined;
+        session.user.role = (token.role || 'READ_ONLY') as 'ADMIN' | 'READ_ONLY';
       }
       return session;
     },

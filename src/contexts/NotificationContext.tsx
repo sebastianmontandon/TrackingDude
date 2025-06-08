@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { useData } from './DataProvider';
 
 export interface Notification {
   id: string;
@@ -22,18 +23,19 @@ interface NotificationContextType {
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
 export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { notifications: initialNotifications, loading, isReadOnly } = useData();
+  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications || []);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar notificaciones al inicializar
+  // Sincronizar notificaciones cuando cambien en DataProvider
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    setNotifications(initialNotifications || []);
+  }, [initialNotifications]);
 
   const fetchNotifications = async () => {
+    if (isReadOnly) return; // No hacer fetch si es de solo lectura
+    
     try {
-      setLoading(true);
       const response = await fetch('/api/notifications');
       if (!response.ok) {
         throw new Error('Error al cargar notificaciones');
@@ -41,17 +43,26 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       const data = await response.json();
       setNotifications(data);
       setError(null);
+      return data;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error fetching notifications:', err);
-    } finally {
-      setLoading(false);
+      throw err;
     }
   };
 
   const addNotification = async (notificationData: Omit<Notification, 'id'>) => {
+    if (isReadOnly) {
+      // Si es de solo lectura, solo actualizar localmente para la sesión actual
+      const newNotification = {
+        ...notificationData,
+        id: `mock-${Date.now()}`,
+      };
+      setNotifications(prev => [...prev, newNotification as Notification]);
+      return newNotification;
+    }
+
     try {
-      setLoading(true);
       const response = await fetch('/api/notifications', {
         method: 'POST',
         headers: {
@@ -65,20 +76,24 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
       }
 
       const newNotification = await response.json();
-      setNotifications(prevNotifications => [...prevNotifications, newNotification]);
+      setNotifications(prev => [...prev, newNotification]);
       setError(null);
+      return newNotification;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error adding notification:', err);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   const removeNotification = async (id: string) => {
+    if (isReadOnly) {
+      // Si es de solo lectura, solo actualizar localmente
+      setNotifications(prev => prev.filter(notification => notification.id !== id));
+      return;
+    }
+
     try {
-      setLoading(true);
       const response = await fetch(`/api/notifications/${id}`, {
         method: 'DELETE',
       });
@@ -87,16 +102,12 @@ export const NotificationProvider: React.FC<{ children: ReactNode }> = ({ childr
         throw new Error('Error al eliminar notificación');
       }
 
-      setNotifications(prevNotifications => 
-        prevNotifications.filter(notification => notification.id !== id)
-      );
+      setNotifications(prev => prev.filter(notification => notification.id !== id));
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error removing notification:', err);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 

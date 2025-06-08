@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '../components/Sidebar'
 import NewDashboard from '../components/pages/NewDashboard'
-import Dashboard from '../components/pages/Dashboard'
+
 import Hosting from '../components/pages/Hosting'
 import Notifications from '../components/pages/Notifications'
 import LoadingModal from '../components/LoadingModal'
@@ -37,8 +37,6 @@ const AppContent: React.FC = () => {
     switch (currentPage) {
       case 'dashboard':
         return <NewDashboard />;
-      case 'domains':
-        return <Dashboard />;
       case 'hosting':
         return <Hosting />;
       case 'notifications':

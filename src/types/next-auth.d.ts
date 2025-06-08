@@ -8,6 +8,7 @@ declare module "next-auth" {
       email?: string | null
       image?: string | null
       phone?: string | null
+      role: 'ADMIN' | 'READ_ONLY'
     }
   }
 
@@ -17,11 +18,13 @@ declare module "next-auth" {
     email?: string | null
     image?: string | null
     phone?: string | null
+    role: 'ADMIN' | 'READ_ONLY'
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
     phone?: string
+    role: 'ADMIN' | 'READ_ONLY'
   }
-} 
+}

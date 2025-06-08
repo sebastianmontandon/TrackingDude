@@ -1,11 +1,8 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = []
-  engineType = "binary"
-  binaryTargets = ["native"]
+  binaryTargets   = ["native"]
+  engineType      = "binary"
 }
 
 datasource db {
@@ -13,22 +10,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Authentication models for NextAuth.js
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
@@ -44,6 +39,12 @@ model Session {
   @@map("sessions")
 }
 
+enum UserRole {
+  USER
+  ADMIN
+  READ_ONLY
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -52,6 +53,7 @@ model User {
   emailVerified DateTime?
   image         String?
   phone         String?
+  role          UserRole  @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   accounts      Account[]
@@ -69,14 +71,13 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-// Notification configuration
 model NotificationConfig {
-  id          String @id @default(cuid())
-  userId      String @unique
-  emailConfig Json?  // Configuration for email notifications
-  whatsappConfig Json? // Configuration for WhatsApp notifications
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  emailConfig    Json?
+  whatsappConfig Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
   @@map("notification_configs")
 }
@@ -88,11 +89,11 @@ model Domain {
   website        String
   paymentPeriod  String
   expirationDate DateTime
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   baseCost       Float
   maintenanceFee Float
   totalCost      Float
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
 
   @@map("domains")
 }
@@ -120,10 +121,10 @@ model Notification {
   provider           String
   notificationDate   DateTime
   notificationMethod NotificationMethod
-  sent               Boolean            @default(false)
-  sentAt             DateTime?
   createdAt          DateTime           @default(now())
   updatedAt          DateTime           @updatedAt
+  sent               Boolean            @default(false)
+  sentAt             DateTime?
 
   @@map("notifications")
 }
@@ -136,4 +137,4 @@ enum NotificationType {
 enum NotificationMethod {
   EMAIL
   WHATSAPP
-} 
+}

@@ -1,7 +1,8 @@
 'use client'
 
 import React from 'react';
-import { Globe, Server, Bell, Home, X, LogOut } from 'lucide-react';
+import { Globe, Server, Bell, Home, X, LogOut, Lock } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 
 interface NavItemProps {
   icon: React.ReactNode;
@@ -36,6 +37,8 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose, onSignOut }) => {
+  const { data: session } = useSession();
+  const isReadOnly = session?.user?.role === 'READ_ONLY';
   return (
     <aside className="w-full h-full bg-card border-r border-border flex flex-col shadow-sm">
       <div>
@@ -110,8 +113,18 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, currentPage, onClose, onS
             <span>Cerrar Sesión</span>
           </button>
         )}
-        <div className="text-xs text-muted-foreground text-center mt-4">
-          © 2025 TrackingDude
+        {isReadOnly && (
+          <div className="mt-4 p-3 bg-yellow-50 border border-yellow-100 rounded-md mb-3">
+            <div className="flex items-start">
+              <Lock className="h-4 w-4 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
+              <p className="text-xs text-yellow-700">
+                Modo de solo lectura. Los cambios no se guardarán permanentemente.
+              </p>
+            </div>
+          </div>
+        )}
+        <div className="text-xs text-muted-foreground text-center mt-2">
+          2025 TrackingDude
         </div>
       </div>
     </aside>

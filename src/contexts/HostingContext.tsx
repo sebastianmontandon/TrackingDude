@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import { useData } from './DataProvider';
 
 export interface Hosting {
   id: string;
@@ -25,18 +26,19 @@ interface HostingContextType {
 const HostingContext = createContext<HostingContextType | undefined>(undefined);
 
 export const HostingProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [hostings, setHostings] = useState<Hosting[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { hostings: initialHostings, loading, isReadOnly } = useData();
+  const [hostings, setHostings] = useState<Hosting[]>(initialHostings || []);
   const [error, setError] = useState<string | null>(null);
 
-  // Cargar hostings al inicializar
+  // Sincronizar hostings cuando cambien en DataProvider
   useEffect(() => {
-    fetchHostings();
-  }, []);
+    setHostings(initialHostings || []);
+  }, [initialHostings]);
 
   const fetchHostings = async () => {
+    if (isReadOnly) return; // No hacer fetch si es de solo lectura
+    
     try {
-      setLoading(true);
       const response = await fetch('/api/hostings');
       if (!response.ok) {
         throw new Error('Error al cargar hostings');
@@ -44,17 +46,28 @@ export const HostingProvider: React.FC<{ children: ReactNode }> = ({ children })
       const data = await response.json();
       setHostings(data);
       setError(null);
+      return data;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error fetching hostings:', err);
-    } finally {
-      setLoading(false);
+      throw err;
     }
   };
 
   const addHosting = async (hostingData: Omit<Hosting, 'id' | 'maintenanceFee' | 'totalCost'>) => {
+    if (isReadOnly) {
+      // Si es de solo lectura, solo actualizar localmente para la sesión actual
+      const newHosting = {
+        ...hostingData,
+        id: `mock-${Date.now()}`,
+        maintenanceFee: 0,
+        totalCost: 0,
+      };
+      setHostings(prev => [...prev, newHosting as Hosting]);
+      return newHosting;
+    }
+
     try {
-      setLoading(true);
       const response = await fetch('/api/hostings', {
         method: 'POST',
         headers: {
@@ -68,20 +81,24 @@ export const HostingProvider: React.FC<{ children: ReactNode }> = ({ children })
       }
 
       const newHosting = await response.json();
-      setHostings(prevHostings => [...prevHostings, newHosting]);
+      setHostings(prev => [...prev, newHosting]);
       setError(null);
+      return newHosting;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error adding hosting:', err);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   const removeHosting = async (id: string) => {
+    if (isReadOnly) {
+      // Si es de solo lectura, solo actualizar localmente
+      setHostings(prev => prev.filter(hosting => hosting.id !== id));
+      return;
+    }
+
     try {
-      setLoading(true);
       const response = await fetch(`/api/hostings/${id}`, {
         method: 'DELETE',
       });
@@ -90,14 +107,12 @@ export const HostingProvider: React.FC<{ children: ReactNode }> = ({ children })
         throw new Error('Error al eliminar hosting');
       }
 
-      setHostings(prevHostings => prevHostings.filter(hosting => hosting.id !== id));
+      setHostings(prev => prev.filter(hosting => hosting.id !== id));
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error desconocido');
       console.error('Error removing hosting:', err);
       throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
